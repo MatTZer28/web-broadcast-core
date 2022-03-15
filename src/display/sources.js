@@ -1,10 +1,12 @@
+import Source from "../lib/source";
+
 export default class Sources {
-    constructor() {
+    constructor(parentScene) {
         this.sources = [];
     }
 
-    addSource(source) {
-        this.sources.push(source);
+    addSource(sourceType) {
+        this.sources.push(new Source(sourceType));
     }
 
     removeSource(sourceIndex) {

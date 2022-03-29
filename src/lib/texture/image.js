@@ -3,16 +3,28 @@ import * as PIXI from 'pixi.js'
 export default class Image extends PIXI.Container {
     constructor(WBS, texture) {
         super();
+
         this._WBS = WBS;
+
         this._sprite = PIXI.Sprite.from(texture);
-        this._box = new PIXI.Graphics();
+
+        this._box = {
+            border: new PIXI.Graphics(),
+            topLeft: new PIXI.Graphics(),
+            topMiddle: new PIXI.Graphics(),
+            topRight: new PIXI.Graphics(),
+            middleLeft: new PIXI.Graphics(),
+            middleRight: new PIXI.Graphics(),
+            bottomLeft: new PIXI.Graphics(),
+            bottomMiddle: new PIXI.Graphics(),
+            bottomRight: new PIXI.Graphics(),
+        }
 
         this._initSprite();
         this._setSpriteInteraction();
+        this._setScaleInteraction();
         this._setBackgroundInteraction();
-
-        this.addChild(this._sprite);
-        this.addChild(this._box);
+        this._addToContainer();
     }
 
     _initSprite() {
@@ -24,14 +36,14 @@ export default class Image extends PIXI.Container {
 
     _setSpriteInteraction() {
         this._sprite.interactive = true;
-        this._sprite.on("mousedown", this._onMouseDown, this);
-        this._sprite.on("mousemove", this._onMouseMove, this);
-        this._sprite.on("mouseup", this._onMouseUp, this);
-        this._sprite.on("mouseover", this._onMouseOver, this);
-        this._sprite.on("mouseout", this._onMouseOut, this);
+        this._sprite.on("mousedown", this._spriteOnMouseDown, this);
+        this._sprite.on("mousemove", this._spriteOnMouseMove, this);
+        this._sprite.on("mouseup", this._spriteOnMouseUp, this);
+        this._sprite.on("mouseover", this._spriteOnMouseOver, this);
+        this._sprite.on("mouseout", this._spriteOnMouseOut, this);
     }
 
-    _onMouseDown(event) {
+    _spriteOnMouseDown(event) {
         this._showRedBox();
 
         this._WBS.setCursor("move");
@@ -45,19 +57,53 @@ export default class Image extends PIXI.Container {
 
     _showRedBox() {
         if (!this._sprite.focused) {
-            this._drawRedBox(4, 0xEB4034);
+            this._drawRedBox();
         }
     }
 
     _drawRedBox() {
-        this._box.lineStyle(4, 0xEB4034);
-        this._box.drawShape(this._sprite.getBounds());
+        this._box.border.lineStyle(4, 0xEB4034);
+        this._box.border.drawShape(this._sprite.getBounds());
+
+        const boxWidth = 20;
+        const boxHeight = 20;
+
+        const first = ["top", "middle", "bottom"];
+        const last = ["Left", "Middle", "Right"];
+        let firstPos = 0;
+        let lastPos = 0;
+
+        const leftMiddleRightX = [
+            this._sprite.getBounds().x - (boxWidth / 2),
+            this._sprite.getBounds().x + (this._sprite.width / 2) - (boxWidth / 2),
+            this._sprite.getBounds().x + this._sprite.width - (boxWidth / 2),
+        ];
+        const topMiddleBottomY = [
+            this._sprite.getBounds().y - (boxHeight / 2),
+            this._sprite.getBounds().y + (this._sprite.height / 2) - (boxHeight / 2),
+            this._sprite.getBounds().y + this._sprite.height - (boxHeight / 2),
+        ];
+
+        topMiddleBottomY.forEach(y => {
+            lastPos = 0;
+            leftMiddleRightX.forEach(x => {
+                if (!(firstPos === 1 && lastPos === 1)) {
+                    this._box[first[firstPos] + last[lastPos]].beginFill(0xEB4034);
+                    this._box[first[firstPos] + last[lastPos]].drawRect(x, y, boxWidth, boxHeight);
+                    this._box[first[firstPos] + last[lastPos]].endFill();
+                }
+                lastPos = lastPos + 1;
+            })
+            firstPos = firstPos + 1;
+        })
     }
 
-    _onMouseMove(event) {
+    _spriteOnMouseMove(event) {
         if (this._sprite.dragging) {
-            let deltaX = event.data.global.x - this._sprite.prevInteractX;
-            let deltaY = event.data.global.y - this._sprite.prevInteractY;
+            event.target.alpha = 0.5;
+
+            const deltaX = event.data.global.x - this._sprite.prevInteractX;
+            const deltaY = event.data.global.y - this._sprite.prevInteractY;
 
             this._moveSprite(deltaX, deltaY);
             this._moveBox(deltaX, deltaY);
@@ -73,31 +119,45 @@ export default class Image extends PIXI.Container {
     }
 
     _moveBox(deltaX, deltaY) {
-        this._box.x = this._box.x + deltaX;
-        this._box.y = this._box.y + deltaY;
+        for (const [key, value] of Object.entries(this._box)) {
+            this._box[key].x = this._box[key].x + deltaX;
+            this._box[key].y = this._box[key].y + deltaY;
+        }
     }
 
-    _onMouseUp(event) {
+    _spriteOnMouseUp(event) {
         this._sprite.dragging = false;
+
+        event.target.alpha = 1  ;
 
         this._WBS.setCursor("auto");
     }
 
-    _onMouseOver(event) {
+    _spriteOnMouseOver(event) {
         if (!this._sprite.focused) {
             this._drawBlueBox();
         }
     }
 
     _drawBlueBox() {
-        this._box.lineStyle(4, 0x00AEB9);
-        this._box.drawShape(this._sprite.getBounds());
+        this._box.border.lineStyle(4, 0x00AEB9);
+        this._box.border.drawShape(this._sprite.getBounds());
     }
 
-    _onMouseOut(event) {
+    _spriteOnMouseOut(event) {
         if (!this._sprite.focused) {
-            this._box.clear();
+            for (const [key, value] of Object.entries(this._box)) {
+                this._box[key].clear();
+            }
         }
+    }
+
+    _setScaleInteraction() {
+        // this._box['topLeft'].on("mousedown", this._boxTopLeftOnMouseDown, this);
+        // this._box['topLeft'].on("mousemove", this._boxTopLeftOnMouseMove, this);
+        // this._box['topLeft'].on("mouseup", this._boxTopLeftOnMouseUp, this);
+        // this._box['topLeft'].on("mouseover", this._boxTopLeftOnMouseOver, this);
+        // this._box['topLeft'].on("mouseout", this._boxTopLeftOnMouseOut, this);
     }
 
     _setBackgroundInteraction() {
@@ -111,20 +171,30 @@ export default class Image extends PIXI.Container {
     }
 
     _isClickInsideSprite(x, y) {
-        let isBiggerThanLeft = (x >= this._sprite.x - (this._sprite.width / 2));
-        let isSmallerThanRight = (x <= this._sprite.x + (this._sprite.width / 2));
-        let isInsideSpriteX = (isBiggerThanLeft && isSmallerThanRight);
+        const isBiggerThanLeft = (x >= this._sprite.x - (this._sprite.width / 2));
+        const isSmallerThanRight = (x <= this._sprite.x + (this._sprite.width / 2));
+        const isInsideSpriteX = (isBiggerThanLeft && isSmallerThanRight);
 
-        let isBiggerThanTop = (y >= this._sprite.y - (this._sprite.height / 2));
-        let isSmallerThanBottom = (y <= this._sprite.y + (this._sprite.height / 2));
-        let isInsideSpriteY = (isBiggerThanTop && isSmallerThanBottom);
+        const isBiggerThanTop = (y >= this._sprite.y - (this._sprite.height / 2));
+        const isSmallerThanBottom = (y <= this._sprite.y + (this._sprite.height / 2));
+        const isInsideSpriteY = (isBiggerThanTop && isSmallerThanBottom);
 
         return (isInsideSpriteX && isInsideSpriteY);
     }
 
     _resetBox() {
-        this._box.clear();
-        this._box.x = 0;
-        this._box.y = 0;
+        for (const [key, value] of Object.entries(this._box)) {
+            this._box[key].clear();
+            this._box[key].x = 0;
+            this._box[key].y = 0;
+        }
+    }
+
+    _addToContainer() {
+        this.addChild(this._sprite);
+
+        for (const [key, value] of Object.entries(this._box)) {
+            this.addChild(value);
+        }
     }
 }

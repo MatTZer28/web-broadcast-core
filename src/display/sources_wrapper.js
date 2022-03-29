@@ -8,7 +8,7 @@ export default class SourcesWrapper {
     }
 
     addSource(sourceType, sourcePath) {
-        let source = new Source(this._WBS, sourceType, sourcePath);
+        const source = new Source(this._WBS, sourceType, sourcePath);
 
         this._sources.push(source);
         this._parentScene.addSourceChild(source.getSource());

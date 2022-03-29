@@ -7,7 +7,7 @@ export default class ScenesWrapper {
     }
 
     createScene() {
-        let scene = new Scene(this._WBS);
+        const scene = new Scene(this._WBS);
 
         this._scenes.push(scene);
         this._WBS.addStageChild(scene);

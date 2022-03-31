@@ -7,6 +7,7 @@ export default class Scene extends PIXI.Container {
         super();
         this._WBS = WBS;
         this._sourcesWrapper = new SourcesWrapper(this._WBS, this);
+        this.sortableChildren = true;
     }
 
     getSourcesWrapper() {
@@ -19,9 +20,9 @@ export default class Scene extends PIXI.Container {
 
     destroy() {
         this.destroy({
-            children:true,
-            texture:true,
-            baseTexture:true
+            children: true,
+            texture: true,
+            baseTexture: true
         });
     }
 }

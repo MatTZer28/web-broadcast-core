@@ -3,13 +3,13 @@ import Image from './texture/image';
 import * as PIXI from 'pixi.js'
 
 export default class Source {
-    constructor(WBS, sourceType, sourcePath) {
+    constructor(WBS, sourceType, sourcePath, sourceWrapper) {
         this._WBS = WBS;
         this.sourceTexture = PIXI.Texture.from(sourcePath);
 
         switch (sourceType) {
             case 'image':
-                this._source = new Image(this._WBS, this.sourceTexture);
+                this._source = new Image(this._WBS, this.sourceTexture, sourceWrapper);
                 break;
             case 'text':
                 break;

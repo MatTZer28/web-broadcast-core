@@ -19,7 +19,9 @@
         sceneWrapper = WBS.getScenesWrapper();
         scene = sceneWrapper.createScene();
         sourceWrapper = scene.getSourcesWrapper();
-        sourceWrapper.addSource('image', 'Apple-logo.png');
+        for (let i = 0; i < 2; i++) {
+            sourceWrapper.addSource('image', 'Apple-logo.png');
+        }
 
     </script>
 </body>

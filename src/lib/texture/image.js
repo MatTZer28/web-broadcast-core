@@ -106,7 +106,7 @@ export default class Image extends PIXI.Container {
         this._WBS.getBackground().on('click', (event) => {
             if (!this._isClickInsideSprite(event.data.global.x, event.data.global.y)) {
                 this._focused = false;
-                this._sourceWrapper.resetBox();
+                this._sourceWrapper.resetFocusBox();
             }
         }, this);
     }

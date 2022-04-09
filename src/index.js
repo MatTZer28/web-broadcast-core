@@ -34,10 +34,6 @@ export class WebBroadcastSysten {
         return this._pixiApp.view;
     }
 
-    getApplicationRendererView() {
-        return this._pixiApp.renderer.view;
-    }
-
     getScenesWrapper() {
         return this._scenesWrapper;
     }

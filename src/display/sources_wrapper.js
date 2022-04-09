@@ -6,12 +6,15 @@ export default class SourcesWrapper {
         this._WBS = WBS;
         this._parentScene = parentScene;
         this._sources = [];
-        this._focusBox = new FocusBox(this._WBS);
+        this._focusBox = new FocusBox(this._WBS, null);
 
         for (const [key, value] of Object.entries(this._focusBox.getFocusBox())) {
             this._parentScene.addChild(value);
             value.zIndex = 2;
         }
+    }
+    setFocusedTarget(focused_target) {
+        this._focusBox.setFocusedTarget(focused_target);
     }
 
     drawFocusBox(x, y, width, height) {

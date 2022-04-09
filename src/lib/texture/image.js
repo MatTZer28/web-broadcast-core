@@ -36,6 +36,7 @@ export default class Image extends PIXI.Container {
 
     _spriteOnMouseDown(event) {
         this._blueBox.clear();
+        this._sourceWrapper.setFocusedTarget(this);
         this._showFocusBox();
 
         this._WBS.setCursor("move");
@@ -48,6 +49,10 @@ export default class Image extends PIXI.Container {
 
         this._sprite.prevInteractX = event.data.global.x;
         this._sprite.prevInteractY = event.data.global.y;
+    }
+
+    setDragging(state) {
+        this._dragging = state;
     }
 
     _showFocusBox() {
@@ -134,5 +139,12 @@ export default class Image extends PIXI.Container {
 
     setInteractiveState(state) {
         this._sprite.interactive = state;
+    }
+
+    resize(x, y, width, height) {
+        this._sprite.x = x;
+        this._sprite.y = y;
+        this._sprite.width = width;
+        this._sprite.height = height;
     }
 }

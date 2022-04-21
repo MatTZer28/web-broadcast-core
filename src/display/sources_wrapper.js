@@ -1,5 +1,10 @@
-import Source from "../lib/source";
 import FocusBox from "../lib/focus_box";
+import Image from '../lib/source/image';
+import Video from '../lib/source/video';
+import Text from '../lib/source/text';
+import DisplayMedia from '../lib/display_media';
+
+import * as PIXI from 'pixi.js'
 
 export default class SourcesWrapper {
     constructor(WBS, parentScene) {
@@ -15,13 +20,33 @@ export default class SourcesWrapper {
         this._parentScene.addChild(this.focusBox);
     }
 
-    async addSource(sourceType, sourcePath) {
-        const source = new Source(this._WBS, sourceType, sourcePath, this);
+    addImageSource(sourcePath) {
+        const sourceTexture = PIXI.Texture.from(sourcePath);
 
-        await source.init();
+        const source = new Image(this._WBS, this, sourceTexture);
 
         this._sources.push(source);
-        this._parentScene.addChild(source.getTexture());
+        this._parentScene.addChild(source);
+    }
+
+    async addVideoSource() {
+        const displayMedia = new DisplayMedia();
+
+        const sourceTexture = PIXI.Texture.from(await displayMedia.createVideoTexture());
+
+        const source = new Video(this._WBS, this, sourceTexture);
+
+        this._sources.push(source);
+        this._parentScene.addChild(source);
+    }
+
+    addTextSource(text, style) {
+        style = style || {};
+        
+        const source = new Text(this._WBS, this, text, style);
+
+        this._sources.push(source);
+        this._parentScene.addChild(source);
     }
 
     getSource(sourceIndex) {
@@ -33,18 +58,18 @@ export default class SourcesWrapper {
         this._sources.splice(sourceIndex, 1);
     }
 
-    unfocusedWithout(texture, state) {
-        this._sources.forEach(source => {
-            if (source.getTexture() !== texture) {
-                source.getTexture().setOnFoucsState(state);
+    unfocusedWithout(source, state) {
+        this._sources.forEach(s=> {
+            if (s !== source) {
+                s.setOnFoucsState(state);
             }
         });
     }
 
-    disableInteractiveWithout(texture, state) {
-        this._sources.forEach(source => {
-            if (source.getTexture() !== texture) {
-                source.getTexture().setInteractiveState(state);
+    disableInteractiveWithout(source, state) {
+        this._sources.forEach(s => {
+            if (s !== source) {
+                s.setInteractiveState(state);
             }
         });
     }

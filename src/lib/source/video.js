@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 
-export default class Image extends PIXI.Container {
-    constructor(WBS, texture, sourceWrapper) {
+export default class Video extends PIXI.Container {
+    constructor(WBS, sourceWrapper, texture) {
         super();
 
         this._dragging = false;
@@ -10,9 +10,9 @@ export default class Image extends PIXI.Container {
 
         this._WBS = WBS;
 
-        this._texture = texture;
-
         this._sourceWrapper = sourceWrapper;
+
+        this._texture = texture;
 
         this._sprite = PIXI.Sprite.from(this._texture);
         this._sprite.name = 'sprite';
@@ -27,6 +27,8 @@ export default class Image extends PIXI.Container {
 
         this._setGlobalInteraction();
 
+        this._setTextureUpdateListener();
+        
         this._addToContainer();
     }
 
@@ -146,6 +148,37 @@ export default class Image extends PIXI.Container {
         });
     }
 
+    _setTextureUpdateListener() {
+        let isSpriteSet = false;
+        let lastBounds = this._sprite.getBounds();
+
+        this._texture.on("update", () => {
+            if (this._texture.width === 2 && this._texture.height === 2) {
+                if (isSpriteSet) return;
+                this._sprite.x = lastBounds.x + lastBounds.width / 2;
+                this._sprite.y = lastBounds.y + lastBounds.height / 2;
+                this._sprite.width = lastBounds.width;
+                this._sprite.height = lastBounds.height;
+                this._sprite.texture = this._createCoverTexture(lastBounds);
+                isSpriteSet = true;
+            } else {
+                if (isSpriteSet) this._sprite.texture = this._texture;
+                isSpriteSet = false;
+                lastBounds = this._sprite.getBounds();
+            }
+        }, this);
+    }
+
+    _createCoverTexture(lastBounds) {
+        let cover = new PIXI.Graphics();
+
+        cover.beginFill(0x5C5C5C, 0.6);
+        cover.drawShape(lastBounds);
+        cover.endFill();
+
+        return this._WBS.getApplication().renderer.generateTexture(cover);
+    }
+
     _addToContainer() {
         this.addChild(this._sprite);
         this.addChild(this._blueBox);
@@ -159,6 +192,10 @@ export default class Image extends PIXI.Container {
         this._sprite.interactive = state;
     }
 
+    getFocusState() {
+        return this._focused;
+    }
+
     getDraggingState() {
         return this._dragging;
     }
@@ -168,5 +205,13 @@ export default class Image extends PIXI.Container {
         this._sprite.y = y;
         this._sprite.width = width;
         this._sprite.height = height;
+    }
+
+    destroy() {
+        this.destroy({
+            children: true,
+            texture: true,
+            baseTexture: true
+        });
     }
 }

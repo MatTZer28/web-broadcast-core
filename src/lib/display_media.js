@@ -7,21 +7,15 @@ export default class DisplayMedia {
             },
             audio: true
           };
-        this._mediaStream = null;
     }
 
-    async createMediaStream() {
+    async createVideoTexture() { 
       const mediaDevices = navigator.mediaDevices;
 
-      this._mediaStream = await mediaDevices.getDisplayMedia(this._displayMediaOptions);
-    }
+      const videoElement = document.createElement('video');
+      videoElement.srcObject = await mediaDevices.getDisplayMedia(this._displayMediaOptions);
 
-    getHTMLVideo() {
-      const video = document.createElement('video');
-
-      video.srcObject = this._mediaStream;
-
-      return video;
+      return videoElement;
     }
 
     closeMediaStream() {

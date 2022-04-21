@@ -1,3 +1,5 @@
+import Video from '../lib/source/video';
+
 import * as PIXI from 'pixi.js'
 
 export default class FocusBox extends PIXI.Container {
@@ -621,7 +623,7 @@ export default class FocusBox extends PIXI.Container {
 
     setFocusedTarget(focusedTarget) {
         this._focusedTarget = focusedTarget;
-        this._onFocusTargetUpdate();
+        if (this._focusedTarget instanceof Video) this._onFocusTargetUpdate();
     }
 
     _onFocusTargetUpdate() {

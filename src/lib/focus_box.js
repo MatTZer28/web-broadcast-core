@@ -1,10 +1,13 @@
 import * as PIXI from 'pixi.js'
 
-export default class FocusBox {
-    constructor(WBS, focused_target) {
+export default class FocusBox extends PIXI.Container {
+    constructor(WBS) {
+        super();
+
         this._WBS = WBS;
-        this._focused_target = focused_target;
+
         this._resizeing = false;
+
         this._focusBox = {
             border: new PIXI.Graphics(),
             topLeft: new PIXI.Graphics(),
@@ -17,6 +20,14 @@ export default class FocusBox {
             bottomRight: new PIXI.Graphics(),
         };
 
+        for (const [key, value] of Object.entries(this._focusBox)) {this.addChild(value);}
+
+        this._setScaleInteraction();
+        
+        this._setGlobalInteraction();
+    }
+
+    _setScaleInteraction() {
         this._setTopLeftScaleInteraction();
         this._setTopMiddleScaleInteraction();
         this._setTopRightScaleInteraction();
@@ -25,7 +36,6 @@ export default class FocusBox {
         this._setBottomLeftScaleInteraction();
         this._setBottomMiddleScaleInteraction();
         this._setBottomRightScaleInteraction();
-        this._setGlobalInteraction();
     }
 
     _setTopLeftScaleInteraction() {
@@ -47,21 +57,53 @@ export default class FocusBox {
     }
 
     _topLeftOnMouseMove(event) {
-        if (event.data.global.x > this._focusBox["border"].prevInteractX + this._focusBox["border"].originWidth) return;
-        if (event.data.global.y > this._focusBox["border"].prevInteractY + this._focusBox["border"].originHeight) return;
+        if (event.data.global.x < 0 || event.data.global.x > this._WBS.appWidth) return;
+        if (event.data.global.y > this._WBS.appHeight || event.data.global.y < 0) return;
         if (this._resizeing === 'topLeft') {
+            const rightX = this._focusBox["border"].prevInteractX + this._focusBox["border"].originWidth;
+            const bottomY = this._focusBox["border"].prevInteractY + this._focusBox["border"].originHeight;
+
+            const isCurrXTooOver = event.data.global.x > rightX;
+            const isCurrYTooOver = event.data.global.y > bottomY;
+
             const deltaX = this._focusBox["border"].prevInteractX - event.data.global.x;
             const deltaY = this._focusBox["border"].prevInteractY - event.data.global.y;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
 
-            this.drawFocusBox(event.data.global.x, event.data.global.y, width + deltaX, height + deltaY);
+            if (isCurrXTooOver && isCurrYTooOver) {
+                this.drawFocusBox(rightX, bottomY, 1, 1);
 
-            const resizeX = event.data.global.x + this._focusBox["border"].width / 2;
-            const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
+                const resizeX = rightX;
+                const resizeY = bottomY;
 
-            this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                return;
+            }
+
+            if (isCurrXTooOver) {
+                this.drawFocusBox(rightX, event.data.global.y, 1, height + deltaY);
+
+                const resizeX = rightX;
+                const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else if (isCurrYTooOver) {
+                this.drawFocusBox(event.data.global.x, bottomY, width + deltaX, 1);
+
+                const resizeX = event.data.global.x + this._focusBox["border"].width / 2;
+                const resizeY = bottomY;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else {
+                this.drawFocusBox(event.data.global.x, event.data.global.y, width + deltaX, height + deltaY);
+
+                const resizeX = event.data.global.x + this._focusBox["border"].width / 2;
+                const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            }
         }
     }
 
@@ -96,14 +138,28 @@ export default class FocusBox {
     }
 
     _topMiddleOnMouseMove(event) {
-        if (event.data.global.y > this._focusBox["border"].prevInteractY + this._focusBox["border"].originHeight) return;
+        if (event.data.global.y > this._WBS.appHeight || event.data.global.y < 0) return;
         if (this._resizeing === 'topMiddle') {
+            const bottomY = this._focusBox["border"].prevInteractY + this._focusBox["border"].originHeight;
+
+            const isCurrYTooOver = event.data.global.y > bottomY;
+
             const deltaY = this._focusBox["border"].prevInteractY - event.data.global.y;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
-            
-            this.drawFocusBox(this._focusBox["border"].originX , event.data.global.y, width, height + deltaY);
+
+            if (isCurrYTooOver) {
+                this.drawFocusBox(this._focusBox["border"].originX, bottomY, width, 1);
+
+                const resizeX = this._focusBox["border"].originX + this._focusBox["border"].width / 2;
+                const resizeY = bottomY;
+
+                this._focusedTarget.resize(resizeX, resizeY, width, this._focusBox["border"].height);
+                return;
+            }
+
+            this.drawFocusBox(this._focusBox["border"].originX, event.data.global.y, width, height + deltaY);
 
             const resizeX = this._focusBox["border"].originX + this._focusBox["border"].width / 2;
             const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
@@ -144,21 +200,53 @@ export default class FocusBox {
     }
 
     _topRightOnMouseMove(event) {
-        if (event.data.global.x < this._focusBox["border"].originX) return;
-        if (event.data.global.y > this._focusBox["border"].prevInteractY + this._focusBox["border"].originHeight) return;
+        if (event.data.global.x < 0 || event.data.global.x > this._WBS.appWidth) return;
+        if (event.data.global.y > this._WBS.appHeight || event.data.global.y < 0) return;
         if (this._resizeing === 'topRight') {
+            const leftX = this._focusBox["border"].originX;
+            const bottomY = this._focusBox["border"].prevInteractY + this._focusBox["border"].originHeight;
+
+            const isCurrXTooOver = event.data.global.x < leftX;
+            const isCurrYTooOver = event.data.global.y > bottomY;
+
             const deltaX = event.data.global.x - this._focusBox["border"].prevInteractX;
             const deltaY = this._focusBox["border"].prevInteractY - event.data.global.y;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
 
-            this.drawFocusBox(this._focusBox["border"].originX, event.data.global.y, width + deltaX, height + deltaY);
+            if (isCurrXTooOver && isCurrYTooOver) {
+                this.drawFocusBox(leftX, bottomY, 1, 1);
 
-            const resizeX = event.data.global.x - this._focusBox["border"].width / 2;
-            const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
+                const resizeX = leftX;
+                const resizeY = bottomY;
 
-            this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                return;
+            }
+
+            if (isCurrXTooOver) {
+                this.drawFocusBox(leftX, event.data.global.y, 1, height + deltaY);
+
+                const resizeX = leftX;
+                const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else if (isCurrYTooOver) {
+                this.drawFocusBox(this._focusBox["border"].originX, bottomY, width + deltaX, 1);
+
+                const resizeX = event.data.global.x - this._focusBox["border"].width / 2;
+                const resizeY = bottomY;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else {
+                this.drawFocusBox(this._focusBox["border"].originX, event.data.global.y, width + deltaX, height + deltaY);
+
+                const resizeX = event.data.global.x - this._focusBox["border"].width / 2;
+                const resizeY = event.data.global.y + this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            }
         }
     }
 
@@ -193,12 +281,26 @@ export default class FocusBox {
     }
 
     _middleLeftOnMouseMove(event) {
-        if (event.data.global.x > this._focusBox["border"].prevInteractX + this._focusBox["border"].originWidth) return;
+        if (event.data.global.x < 0 || event.data.global.x > this._WBS.appWidth) return;
         if (this._resizeing === 'middleLeft') {
+            const rightX = this._focusBox["border"].prevInteractX + this._focusBox["border"].originWidth;
+
+            const isCurrXTooOver = event.data.global.x > rightX;
+
             const deltaX = this._focusBox["border"].prevInteractX - event.data.global.x;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
+
+            if (isCurrXTooOver) {
+                this.drawFocusBox(rightX, this._focusBox["border"].originY, 1, height);
+
+                const resizeX = rightX;
+                const resizeY = this._focusBox["border"].originY + this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                return;
+            }
 
             this.drawFocusBox(event.data.global.x, this._focusBox["border"].originY, width + deltaX, height);
 
@@ -241,12 +343,26 @@ export default class FocusBox {
     }
 
     _middleRightOnMouseMove(event) {
-        if (event.data.global.x < this._focusBox["border"].originX) return;
+        if (event.data.global.x < 0 || event.data.global.x > this._WBS.appWidth) return;
         if (this._resizeing === 'middleRight') {
+            const leftX = this._focusBox["border"].originX;
+
+            const isCurrXTooOver = event.data.global.x < leftX;
+
             const deltaX = event.data.global.x - this._focusBox["border"].prevInteractX;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
+
+            if (isCurrXTooOver) {
+                this.drawFocusBox(leftX, this._focusBox["border"].originY, 1, height);
+
+                const resizeX = leftX;
+                const resizeY = this._focusBox["border"].originY + this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                return;
+            }
 
             this.drawFocusBox(this._focusBox["border"].originX, this._focusBox["border"].originY, width + deltaX, height);
 
@@ -288,21 +404,53 @@ export default class FocusBox {
     }
 
     _bottomLeftOnMouseMove(event) {
-        if (event.data.global.x > this._focusBox["border"].prevInteractX + this._focusBox["border"].originWidth) return;
-        if (event.data.global.y < this._focusBox["border"].prevInteractY - this._focusBox["border"].originHeight) return;
+        if (event.data.global.x < 0 || event.data.global.x > this._WBS.appWidth) return;
+        if (event.data.global.y > this._WBS.appHeight || event.data.global.y < 0) return;
         if (this._resizeing === 'bottomLeft') {
+            const rightX = this._focusBox["border"].prevInteractX + this._focusBox["border"].originWidth;
+            const topY = this._focusBox["border"].prevInteractY - this._focusBox["border"].originHeight;
+
+            const isCurrXTooOver = event.data.global.x > rightX;
+            const isCurrYTooOver = event.data.global.y < topY;
+
             const deltaX = this._focusBox["border"].prevInteractX - event.data.global.x;
             const deltaY = event.data.global.y - this._focusBox["border"].prevInteractY;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
 
-            this.drawFocusBox(event.data.global.x, event.data.global.y - this._focusBox["border"].height, width + deltaX, height + deltaY);
+            if (isCurrXTooOver && isCurrYTooOver) {
+                this.drawFocusBox(rightX, topY, 1, 1);
 
-            const resizeX = event.data.global.x + this._focusBox["border"].width / 2;
-            const resizeY = event.data.global.y - this._focusBox["border"].height / 2;
+                const resizeX = rightX;
+                const resizeY = topY;
 
-            this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                return;
+            }
+
+            if (isCurrXTooOver) {
+                this.drawFocusBox(rightX, event.data.global.y - this._focusBox["border"].height, 1, height + deltaY);
+
+                const resizeX = rightX;
+                const resizeY = event.data.global.y - this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else if (isCurrYTooOver) {
+                this.drawFocusBox(event.data.global.x, topY, width + deltaX, 1);
+
+                const resizeX = event.data.global.x + this._focusBox["border"].width / 2;
+                const resizeY = topY;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else {
+                this.drawFocusBox(event.data.global.x, event.data.global.y - this._focusBox["border"].height, width + deltaX, height + deltaY);
+
+                const resizeX = event.data.global.x + this._focusBox["border"].width / 2;
+                const resizeY = event.data.global.y - this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            }
         }
     }
 
@@ -337,13 +485,27 @@ export default class FocusBox {
     }
 
     _bottomMiddleOnMouseMove(event) {
-        if (event.data.global.y < this._focusBox["border"].prevInteractY - this._focusBox["border"].originHeight) return;
+        if (event.data.global.y > this._WBS.appHeight || event.data.global.y < 0) return;
         if (this._resizeing === 'bottomMiddle') {
+            const topY = this._focusBox["border"].prevInteractY - this._focusBox["border"].originHeight;
+
+            const isCurrYTooOver = event.data.global.y < topY;
+
             const deltaY = event.data.global.y - this._focusBox["border"].prevInteractY;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
-            
+
+            if (isCurrYTooOver) {
+                this.drawFocusBox(this._focusBox["border"].originX, topY, width, 1);
+
+                const resizeX = this._focusBox["border"].originX + this._focusBox["border"].width / 2;
+                const resizeY = topY;
+
+                this._focusedTarget.resize(resizeX, resizeY, width, this._focusBox["border"].height);
+                return;
+            }
+
             this.drawFocusBox(this._focusBox["border"].originX, event.data.global.y - this._focusBox["border"].height, width, height + deltaY);
 
             const resizeX = this._focusBox["border"].originX + this._focusBox["border"].width / 2;
@@ -385,21 +547,53 @@ export default class FocusBox {
     }
 
     _bottomRightOnMouseMove(event) {
-        if (event.data.global.x < this._focusBox["border"].originX) return;
-        if (event.data.global.y < this._focusBox["border"].prevInteractY - this._focusBox["border"].originHeight) return;
+        if (event.data.global.x < 0 || event.data.global.x > this._WBS.appWidth) return;
+        if (event.data.global.y > this._WBS.appHeight || event.data.global.y < 0) return;
         if (this._resizeing === 'bottomRight') {
+            const leftX = this._focusBox["border"].originX;
+            const topY = this._focusBox["border"].prevInteractY - this._focusBox["border"].originHeight;
+
+            const isCurrXTooOver = event.data.global.x < leftX;
+            const isCurrYTooOver = event.data.global.y < topY;
+
             const deltaX = event.data.global.x - this._focusBox["border"].prevInteractX;
             const deltaY = event.data.global.y - this._focusBox["border"].prevInteractY;
 
             const width = this._focusBox["border"].originWidth;
             const height = this._focusBox["border"].originHeight;
 
-            this.drawFocusBox(this._focusBox["border"].originX, event.data.global.y - this._focusBox["border"].height, width + deltaX, height + deltaY);
+            if (isCurrXTooOver && isCurrYTooOver) {
+                this.drawFocusBox(leftX, topY, 1, 1);
 
-            const resizeX = event.data.global.x - this._focusBox["border"].width / 2;
-            const resizeY = event.data.global.y - this._focusBox["border"].height / 2;
+                const resizeX = leftX;
+                const resizeY = topY;
 
-            this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+                return;
+            }
+
+            if (isCurrXTooOver) {
+                this.drawFocusBox(leftX, event.data.global.y - this._focusBox["border"].height, 1, height + deltaY);
+
+                const resizeX = leftX;
+                const resizeY = event.data.global.y - this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else if (isCurrYTooOver) {
+                this.drawFocusBox(this._focusBox["border"].originX, topY, width + deltaX, 1);
+
+                const resizeX = event.data.global.x - this._focusBox["border"].width / 2;
+                const resizeY = topY;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            } else {
+                this.drawFocusBox(this._focusBox["border"].originX, event.data.global.y - this._focusBox["border"].height, width + deltaX, height + deltaY);
+
+                const resizeX = event.data.global.x - this._focusBox["border"].width / 2;
+                const resizeY = event.data.global.y - this._focusBox["border"].height / 2;
+
+                this._focusedTarget.resize(resizeX, resizeY, this._focusBox["border"].width, this._focusBox["border"].height);
+            }
         }
     }
 
@@ -425,8 +619,28 @@ export default class FocusBox {
         return this._focusBox;
     }
 
-    setFocusedTarget(focused_target) {
-        this._focusedTarget = focused_target;
+    setFocusedTarget(focusedTarget) {
+        this._focusedTarget = focusedTarget;
+        this._onFocusTargetUpdate();
+    }
+
+    _onFocusTargetUpdate() {
+        let preWidth = this._focusedTarget.getChildByName('sprite').width;
+        let preHeight = this._focusedTarget.getChildByName('sprite').height;
+        
+        this._focusedTarget.getChildByName('sprite').texture.on("update", () => {
+            if (this._resizeing !== null || !this._focusedTarget.getFocusState() || this._focusedTarget.getDraggingState()) return;
+
+            const width = this._focusedTarget.getChildByName('sprite').width;
+            const height = this._focusedTarget.getChildByName('sprite').height;
+            const x = this._focusedTarget.getChildByName('sprite').x - width / 2;
+            const y = this._focusedTarget.getChildByName('sprite').y - height / 2;
+
+            if (width !== preWidth || height !== preHeight) this.drawFocusBox(x, y, width, height);
+
+            preWidth = this._focusedTarget.getChildByName('sprite').width;
+            preHeight = this._focusedTarget.getChildByName('sprite').height;
+        }, this);
     }
 
     drawFocusBox(x, y, width, height) {

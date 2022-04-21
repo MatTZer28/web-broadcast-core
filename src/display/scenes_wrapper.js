@@ -3,6 +3,7 @@ import Scene from '../lib/scene';
 export default class ScenesWrapper {
     constructor(WBS) {
         this._WBS = WBS;
+        
         this._scenes = [];
     }
 
@@ -11,6 +12,7 @@ export default class ScenesWrapper {
 
         this._scenes.push(scene);
         this._WBS.addStageChild(scene);
+
         return scene;
     }
 

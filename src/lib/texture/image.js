@@ -3,18 +3,30 @@ import * as PIXI from 'pixi.js'
 export default class Image extends PIXI.Container {
     constructor(WBS, texture, sourceWrapper) {
         super();
+
         this._dragging = false;
+
         this._focused = false;
 
         this._WBS = WBS;
+
+        this._texture = texture;
+
         this._sourceWrapper = sourceWrapper;
 
-        this._sprite = PIXI.Sprite.from(texture);
+        this._sprite = PIXI.Sprite.from(this._texture);
+        this._sprite.name = 'sprite';
+
         this._blueBox = new PIXI.Graphics();
 
         this._initSprite();
+
         this._setSpriteInteraction();
+
         this._setBackgroundInteraction();
+
+        this._setGlobalInteraction();
+
         this._addToContainer();
     }
 
@@ -36,7 +48,7 @@ export default class Image extends PIXI.Container {
 
     _spriteOnMouseDown(event) {
         this._blueBox.clear();
-        this._sourceWrapper.setFocusedTarget(this);
+        this._sourceWrapper.focusBox.setFocusedTarget(this);
         this._showFocusBox();
 
         this._WBS.setCursor("move");
@@ -44,8 +56,8 @@ export default class Image extends PIXI.Container {
         this._focused = true;
         this._dragging = true;
 
-        this._sourceWrapper.setSourceOnFocusedStateWithout(this, false);
-        this._sourceWrapper.setSourceOnInteractiveStateWithout(this, false);
+        this._sourceWrapper.unfocusedWithout(this, false);
+        this._sourceWrapper.disableInteractiveWithout(this, false);
 
         this._sprite.prevInteractX = event.data.global.x;
         this._sprite.prevInteractY = event.data.global.y;
@@ -60,7 +72,7 @@ export default class Image extends PIXI.Container {
             let width = this._sprite.width;
             let height = this._sprite.height;
             let bounds = this._sprite.getBounds();
-            this._sourceWrapper.drawFocusBox(bounds.x, bounds.y, width, height);
+            this._sourceWrapper.focusBox.drawFocusBox(bounds.x, bounds.y, width, height);
         }
     }
 
@@ -70,7 +82,7 @@ export default class Image extends PIXI.Container {
             const deltaY = event.data.global.y - this._sprite.prevInteractY;
 
             this._moveSprite(deltaX, deltaY);
-            this._sourceWrapper.moveFocusBox(deltaX, deltaY);
+            this._sourceWrapper.focusBox.moveFocusBox(deltaX, deltaY);
 
             this._sprite.prevInteractX = event.data.global.x;
             this._sprite.prevInteractY = event.data.global.y;
@@ -85,7 +97,7 @@ export default class Image extends PIXI.Container {
     _spriteOnMouseUp(event) {
         this._dragging = false;
 
-        this._sourceWrapper.setSourceOnInteractiveStateWithout(this, true);
+        this._sourceWrapper.disableInteractiveWithout(this, true);
 
         this._WBS.setCursor("auto");
     }
@@ -108,10 +120,10 @@ export default class Image extends PIXI.Container {
     }
 
     _setBackgroundInteraction() {
-        this._WBS.getBackground().on('click', (event) => {
+        this._WBS.background.on('click', (event) => {
             if (!this._isClickInsideSprite(event.data.global.x, event.data.global.y)) {
                 this._focused = false;
-                this._sourceWrapper.resetFocusBox();
+                this._sourceWrapper.focusBox.resetFocusBox();
             }
         }, this);
     }
@@ -128,6 +140,12 @@ export default class Image extends PIXI.Container {
         return (isInsideSpriteX && isInsideSpriteY);
     }
 
+    _setGlobalInteraction() {
+        document.body.addEventListener('mouseup', e => {
+            this._dragging = null;
+        });
+    }
+
     _addToContainer() {
         this.addChild(this._sprite);
         this.addChild(this._blueBox);
@@ -139,6 +157,10 @@ export default class Image extends PIXI.Container {
 
     setInteractiveState(state) {
         this._sprite.interactive = state;
+    }
+
+    getDraggingState() {
+        return this._dragging;
     }
 
     resize(x, y, width, height) {

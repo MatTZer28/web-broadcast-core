@@ -1,4 +1,5 @@
 import ScenesWrapper from './display/scenes_wrapper';
+import StreamManager from './lib/stream_manager';
 
 import * as PIXI from 'pixi.js'
 
@@ -14,6 +15,8 @@ export class WebBroadcastSysten {
         this._initBackground();
         
         this._scenesWrapper = new ScenesWrapper(this);
+        
+        this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
     }
 
     _createApplication() {

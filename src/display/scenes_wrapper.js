@@ -7,13 +7,17 @@ export default class ScenesWrapper {
         this._scenes = [];
     }
 
-    createScene() {
-        const scene = new Scene(this._WBS);
+    createScene(name) {
+        const scene = new Scene(this._WBS, name);
 
         this._scenes.push(scene);
         this._WBS.addStageChild(scene);
 
         return scene;
+    }
+
+    getScenesLength() {
+        return this._scenes.length;
     }
 
     getScene(sceneIndex) {

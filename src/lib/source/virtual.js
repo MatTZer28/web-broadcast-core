@@ -23,6 +23,7 @@ export default class Virtual extends PIXI.Container {
     async loadModel(sourcePath) {
         this._model = await Live2DModel.from(sourcePath, { autoInteract: false });
         this._model.name = 'sprite';
+        this._model.internalModel.breath = null;
 
         this._videoElement = document.createElement('video');
 
@@ -200,121 +201,73 @@ export default class Virtual extends PIXI.Container {
     _rigFace(result, lerpAmount = 0.7) {
         if (!this._model || !result) return;
 
-        const updateFn = this._model.internalModel.motionManager.update;
         const coreModel = this._model.internalModel.coreModel;
 
         this._model.internalModel.motionManager.update = (...args) => {
             this._model.internalModel.eyeBlink = undefined;
 
-            coreModel.setParameterValueById(
-                "ParamEyeBallX",
-                Kalidokit.Vector.lerp(
-                    result.pupil.x,
-                    coreModel.getParameterValueById("ParamEyeBallX"),
-                    lerpAmount
-                )
-            );
+            const EyeBallX = Kalidokit.Vector.lerp(result.pupil.x, coreModel.getParameterValueById("ParamEyeBallX"), lerpAmount);
 
-            coreModel.setParameterValueById(
-                "ParamEyeBallY",
-                Kalidokit.Vector.lerp(
-                    result.pupil.y,
-                    coreModel.getParameterValueById("ParamEyeBallY"),
-                    lerpAmount
-                )
-            );
+            coreModel.setParameterValueById("ParamEyeBallX", EyeBallX);
+            coreModel.setParameterValueById("PARAM_EYE_BALL_X", EyeBallX);
 
-            coreModel.setParameterValueById(
-                "ParamAngleX",
-                Kalidokit.Vector.lerp(
-                    result.head.degrees.y,
-                    coreModel.getParameterValueById("ParamAngleX"),
-                    lerpAmount
-                )
-            );
+            const EyeBallY = Kalidokit.Vector.lerp(result.pupil.y, coreModel.getParameterValueById("ParamEyeBallY"), lerpAmount);
 
-            coreModel.setParameterValueById(
-                "ParamAngleY",
-                Kalidokit.Vector.lerp(
-                    result.head.degrees.x,
-                    coreModel.getParameterValueById("ParamAngleY"),
-                    lerpAmount
-                )
-            );
+            coreModel.setParameterValueById("ParamEyeBallY", EyeBallY);
+            coreModel.setParameterValueById("PARAM_EYE_BALL_y", EyeBallY);
 
-            coreModel.setParameterValueById(
-                "ParamAngleZ",
-                Kalidokit.Vector.lerp(
-                    result.head.degrees.z,
-                    coreModel.getParameterValueById("ParamAngleZ"),
-                    lerpAmount
-                )
-            );
+            const angleX = Kalidokit.Vector.lerp(result.head.degrees.y, coreModel.getParameterValueById("ParamAngleX"), lerpAmount);
+
+            coreModel.setParameterValueById("ParamAngleX", angleX);
+            coreModel.setParameterValueById("PARAM_ANGLE_X", angleX);
+
+            const angleY = Kalidokit.Vector.lerp(result.head.degrees.x, coreModel.getParameterValueById("ParamAngleY"), lerpAmount);
+
+            coreModel.setParameterValueById("ParamAngleY", angleY);
+            coreModel.setParameterValueById("PARAM_ANGLE_Y", angleY);
+
+            const angleZ = Kalidokit.Vector.lerp(result.head.degrees.z, coreModel.getParameterValueById("ParamAngleZ"), lerpAmount);
+
+            coreModel.setParameterValueById("ParamAngleZ", angleZ);
+            coreModel.setParameterValueById("PARAM_ANGLE_Z", angleZ);
 
             const dampener = 0.3;
-            coreModel.setParameterValueById(
-                "ParamBodyAngleX",
-                Kalidokit.Vector.lerp(
-                    result.head.degrees.y * dampener,
-                    coreModel.getParameterValueById("ParamBodyAngleX"),
-                    lerpAmount
-                )
-            );
+            const bodyAngleX = Kalidokit.Vector.lerp(result.head.degrees.y * dampener, coreModel.getParameterValueById("ParamBodyAngleX"), lerpAmount);
 
-            coreModel.setParameterValueById(
-                "ParamBodyAngleY",
-                Kalidokit.Vector.lerp(
-                    result.head.degrees.x * dampener,
-                    coreModel.getParameterValueById("ParamBodyAngleY"),
-                    lerpAmount
-                )
-            );
+            coreModel.setParameterValueById("ParamBodyAngleX", bodyAngleX);
+            coreModel.setParameterValueById("PARAM_BODY_ANGLE_X", bodyAngleX);
 
-            coreModel.setParameterValueById(
-                "ParamBodyAngleZ",
-                Kalidokit.Vector.lerp(
-                    result.head.degrees.z * dampener,
-                    coreModel.getParameterValueById("ParamBodyAngleZ"),
-                    lerpAmount
-                )
-            );
+            const bodyAngleY = Kalidokit.Vector.lerp(result.head.degrees.x * dampener, coreModel.getParameterValueById("ParamBodyAngleY"), lerpAmount);
 
-            coreModel.setParameterValueById(
-                "ParamEyeLOpen",
-                Kalidokit.Vector.lerp(
-                    result.eye.l,
-                    coreModel.getParameterValueById("ParamEyeLOpen"),
-                    0.5
-                )
-            );
 
-            coreModel.setParameterValueById(
-                "ParamEyeROpen",
-                Kalidokit.Vector.lerp(
-                    result.eye.r,
-                    coreModel.getParameterValueById("ParamEyeROpen"),
-                    0.5
-                )
-            );
+            coreModel.setParameterValueById("ParamBodyAngleY", bodyAngleY);
+            coreModel.setParameterValueById("PARAM_BODY_ANGLE_Y", bodyAngleY);
 
-            coreModel.setParameterValueById(
-                "ParamMouthOpenY",
-                Kalidokit.Vector.lerp(
-                    result.mouth.y,
-                    coreModel.getParameterValueById("ParamMouthOpenY"),
-                    0.3
-                )
-            );
+            const bodyAngleZ = Kalidokit.Vector.lerp(result.head.degrees.z * dampener, coreModel.getParameterValueById("ParamBodyAngleZ"), lerpAmount);
 
-            coreModel.setParameterValueById(
-                "ParamMouthForm",
-                0.3 +
-                Kalidokit.Vector.lerp(
-                    result.mouth.x,
-                    coreModel.getParameterValueById("ParamMouthForm"),
-                    0.3
-                )
-            );
+            coreModel.setParameterValueById("ParamBodyAngleZ", bodyAngleZ);
+            coreModel.setParameterValueById("PARAM_BODY_ANGLE_Z", bodyAngleZ);
+
+            const eyeLOpen = Kalidokit.Vector.lerp(result.eye.l, coreModel.getParameterValueById("ParamEyeLOpen"), 0.5);
+
+            coreModel.setParameterValueById("ParamEyeLOpen", eyeLOpen);
+            coreModel.setParameterValueById("PARAM_EYE_L_OPEN", eyeLOpen);
+
+            const eyeROpen = Kalidokit.Vector.lerp(result.eye.r, coreModel.getParameterValueById("ParamEyeROpen"), 0.5);
+
+
+            coreModel.setParameterValueById("ParamEyeROpen", eyeROpen);
+            coreModel.setParameterValueById("PARAM_EYE_R_OPEN", eyeROpen);
+
+            const mouthOpenY = Kalidokit.Vector.lerp(result.mouth.y, coreModel.getParameterValueById("ParamMouthOpenY"), 0.3);
+
+            coreModel.setParameterValueById("ParamMouthOpenY", mouthOpenY);
+            coreModel.setParameterValueById("PARAM_MOUTH_OPEN_Y", mouthOpenY);
+
+            const mouthForm = 0.3 + Kalidokit.Vector.lerp(result.mouth.x, coreModel.getParameterValueById("ParamMouthForm"), 0.3);
+
+            coreModel.setParameterValueById("ParamMouthForm", mouthForm);
+            coreModel.setParameterValueById("PARAM_MOUTH_FORM", mouthForm);
         };
     }
 
@@ -323,8 +276,8 @@ export default class Virtual extends PIXI.Container {
             onFrame: async () => {
                 await this._facemesh.send({ image: this._videoElement });
             },
-            width: 640,
-            height: 480
+            width: 1280,
+            height: 720
         });
         camera.start();
     }

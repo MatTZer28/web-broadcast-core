@@ -1,4 +1,5 @@
-import FocusBox from "../lib/focus_box";
+import FocusBox from '../lib/focus_box';
+import Virtual from '../lib/source/virtual';
 import Image from '../lib/source/image';
 import Video from '../lib/source/video';
 import Text from '../lib/source/text';
@@ -18,6 +19,17 @@ export default class SourcesWrapper {
         this.focusBox.zIndex = 2;
 
         this._parentScene.addChild(this.focusBox);
+    }
+
+    async addVirtualModel(sourcePath) {
+        const source = new Virtual(this._WBS, this);
+        
+        await source.loadModel(sourcePath);
+
+        source.zIndex = 2;
+
+        this._sources.push(source);
+        this._parentScene.addChild(source);
     }
 
     addImageSource(sourcePath) {

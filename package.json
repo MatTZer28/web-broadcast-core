@@ -13,7 +13,11 @@
   "dependencies": {
     "@ffmpeg/core": "^0.10.0",
     "@ffmpeg/ffmpeg": "^0.10.1",
-    "pixi.js": "^6.2.2"
+    "@mediapipe/camera_utils": "^0.3.1640029074",
+    "@mediapipe/face_mesh": "^0.4.1633559619",
+    "kalidokit": "^1.1.5",
+    "pixi-live2d-display": "^0.3.1",
+    "pixi.js": "^5.3.6"
   },
   "devDependencies": {
     "source-map-loader": "^3.0.1",

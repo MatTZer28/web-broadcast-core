@@ -15,6 +15,10 @@ module.exports = {
         static: {
             directory: path.join(__dirname, "dist"),
         },
+        headers: {
+            'Cross-Origin-Embedder-Policy': 'require-corp',
+            'Cross-Origin-Opener-Policy': 'same-origin',
+        },
     },
     module: {
         rules: [

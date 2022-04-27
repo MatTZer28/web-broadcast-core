@@ -16,9 +16,9 @@ export class WebBroadcastSysten {
         
         this._scenesWrapper = new ScenesWrapper(this);
         
-        this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
+        // this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
 
-        this._streamManager.startStreaming();
+        // this._streamManager.startStreaming();
     }
 
     _createApplication() {

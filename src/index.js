@@ -3,7 +3,7 @@ import StreamManager from './lib/stream_manager';
 
 import * as PIXI from 'pixi.js'
 
-export class WebBroadcastSysten {
+export class WebBroadcastSystem {
     constructor(appWidth, appHeight) {
         this.appWidth = appWidth;
 
@@ -15,10 +15,6 @@ export class WebBroadcastSysten {
         this._initBackground();
         
         this._scenesWrapper = new ScenesWrapper(this);
-        
-        // this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
-
-        // this._streamManager.startStreaming();
     }
 
     _createApplication() {

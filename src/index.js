@@ -4,23 +4,61 @@ import StreamManager from './lib/stream_manager';
 import * as PIXI from 'pixi.js'
 
 export class WebBroadcastSystem {
-    constructor(appWidth, appHeight) {
+    constructor(canvas, appWidth, appHeight) {
         this.appWidth = appWidth;
 
         this.appHeight = appHeight;
         
-        this._pixiApp = this._createApplication();
+        this._pixiApp = this._createApplication(canvas);
+        this._offTabRunning();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
         this._initBackground();
         
         this._scenesWrapper = new ScenesWrapper(this);
+
+        this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
+
+        this._streamManager.startRecording();
+
+        setTimeout(async () => {
+            this._streamManager.stopRecording();
+
+            this._streamManager.getRecorder().addEventListener('dataavailable', (e) => {
+                let video = document.querySelector('video');
+
+                let videoUrl = window.URL.createObjectURL(e.data);
+
+                video.src = videoUrl;
+            });
+        }, 10000);
     }
 
-    _createApplication() {
+    _createApplication(canvas) {
         return new PIXI.Application({
             width: this.appWidth,
             height: this.appHeight,
+            view: canvas
+        });
+    }
+
+    _offTabRunning() {
+        let worker = new Worker(new URL('./lib/offscreen_worker.js', import.meta.url));
+
+        let ticker = this._pixiApp.ticker;
+
+        let renderer = this._pixiApp.renderer;
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState == "hidden") {
+                worker.postMessage('start');
+            } else {
+                worker.postMessage('stop');
+            }
+        });
+
+        worker.addEventListener('message', (e) => {
+            renderer.render(this._pixiApp.stage);
         });
     }
 

@@ -16,7 +16,7 @@ self.addEventListener('message', (e) => {
 
 function frame() {
     if (!switcher) return;
-    
+
     self.postMessage('tick');
     requestAnimationFrame(frame);
 }

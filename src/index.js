@@ -4,12 +4,12 @@ import StreamManager from './lib/stream_manager';
 import * as PIXI from 'pixi.js'
 
 export class WebBroadcastSystem {
-    constructor(canvas, appWidth, appHeight) {
+    constructor(appWidth, appHeight) {
         this.appWidth = appWidth;
 
         this.appHeight = appHeight;
         
-        this._pixiApp = this._createApplication(canvas);
+        this._pixiApp = this._createApplication();
         this._offTabRunning();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
@@ -19,26 +19,25 @@ export class WebBroadcastSystem {
 
         this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
 
-        this._streamManager.startRecording();
+        // this._streamManager.startRecording();
 
-        setTimeout(async () => {
-            this._streamManager.stopRecording();
+        // setTimeout(async () => {
+        //     this._streamManager.stopRecording();
 
-            this._streamManager.getRecorder().addEventListener('dataavailable', (e) => {
-                let video = document.querySelector('video');
+        //     this._streamManager.getRecorder().addEventListener('dataavailable', (e) => {
+        //         let video = document.querySelector('video');
 
-                let videoUrl = window.URL.createObjectURL(e.data);
+        //         let videoUrl = window.URL.createObjectURL(e.data);
 
-                video.src = videoUrl;
-            });
-        }, 10000);
+        //         video.src = videoUrl;
+        //     });
+        // }, 10000);
     }
 
-    _createApplication(canvas) {
+    _createApplication() {
         return new PIXI.Application({
             width: this.appWidth,
-            height: this.appHeight,
-            view: canvas
+            height: this.appHeight
         });
     }
 
@@ -51,13 +50,17 @@ export class WebBroadcastSystem {
 
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState == "hidden") {
+                ticker.stop();
                 worker.postMessage('start');
             } else {
                 worker.postMessage('stop');
+                ticker.start();
             }
         });
 
         worker.addEventListener('message', (e) => {
+            console.log(new Date().toLocaleTimeString());
+            ticker.update();
             renderer.render(this._pixiApp.stage);
         });
     }

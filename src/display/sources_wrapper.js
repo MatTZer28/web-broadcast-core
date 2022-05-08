@@ -21,42 +21,43 @@ export default class SourcesWrapper {
         this._parentScene.addChild(this.focusBox);
     }
 
-    async addVirtualModel(sourcePath) {
+    async createVirtualModel(sourcePath) {
         const source = new Virtual(this._WBS, this);
         
         await source.loadModel(sourcePath);
 
         source.zIndex = 2;
 
-        this._sources.push(source);
-        this._parentScene.addChild(source);
+        return source;
     }
 
-    addImageSource(sourcePath) {
+    createImageSource(sourcePath) {
         const sourceTexture = PIXI.Texture.from(sourcePath);
 
         const source = new Image(this._WBS, this, sourceTexture);
 
-        this._sources.push(source);
-        this._parentScene.addChild(source);
+        return source;
     }
 
-    async addVideoSource() {
+    async createVideoSource() {
         const displayMedia = new DisplayMedia();
 
         const sourceTexture = PIXI.Texture.from(await displayMedia.createVideoTexture());
 
         const source = new Video(this._WBS, this, sourceTexture);
 
-        this._sources.push(source);
-        this._parentScene.addChild(source);
+        return source;
     }
 
-    addTextSource(text, style) {
+    createTextSource(text, style) {
         style = style || {};
         
         const source = new Text(this._WBS, this, text, style);
 
+        return source;
+    }
+
+    addSource(source) {
         this._sources.push(source);
         this._parentScene.addChild(source);
     }

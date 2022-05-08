@@ -10,7 +10,6 @@ export class WebBroadcastSystem {
         this.appHeight = appHeight;
         
         this._pixiApp = this._createApplication();
-        this._offTabRunning();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
         this._initBackground();
@@ -41,30 +40,6 @@ export class WebBroadcastSystem {
         });
     }
 
-    _offTabRunning() {
-        let worker = new Worker(new URL('./lib/offscreen_worker.js', import.meta.url));
-
-        let ticker = this._pixiApp.ticker;
-
-        let renderer = this._pixiApp.renderer;
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState == "hidden") {
-                ticker.stop();
-                worker.postMessage('start');
-            } else {
-                worker.postMessage('stop');
-                ticker.start();
-            }
-        });
-
-        worker.addEventListener('message', (e) => {
-            console.log(new Date().toLocaleTimeString());
-            ticker.update();
-            renderer.render(this._pixiApp.stage);
-        });
-    }
-
     _initBackground() {
         this.background.width = this.appWidth;
         this.background.height = this.appHeight;
@@ -83,6 +58,10 @@ export class WebBroadcastSystem {
 
     getScenesWrapper() {
         return this._scenesWrapper;
+    }
+
+    getStreamManager() {
+        return this._streamManager;
     }
 
     addStageChild(child) {

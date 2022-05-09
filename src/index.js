@@ -10,6 +10,7 @@ export class WebBroadcastSystem {
         this.appHeight = appHeight;
         
         this._pixiApp = this._createApplication();
+        //this._offTabRunning();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
         this._initBackground();
@@ -37,6 +38,34 @@ export class WebBroadcastSystem {
         return new PIXI.Application({
             width: this.appWidth,
             height: this.appHeight
+        });
+    }
+
+    _offTabRunning() {
+        const ticker = PIXI.Ticker.shared;
+
+        const renderer = PIXI.autoDetectRenderer();
+
+        const worker = new Worker(new URL('./lib/worker.js', import.meta.url));
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState == "hidden") {
+                //ticker.stop();
+                worker.postMessage('start');
+            } else {
+                worker.postMessage('stop');
+                //ticker.start();
+            }
+        });
+
+        worker.onmessage = (e) => {
+            if (e.data === 'tick') {
+                ticker.update();
+            }
+        };
+
+        ticker.add((time) => {
+            renderer.render(this._pixiApp.stage);
         });
     }
 

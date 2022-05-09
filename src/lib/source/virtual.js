@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import * as Kalidokit from 'kalidokit'
+import * as Kalidokit from 'kalidokit';
 
 window.PIXI = PIXI;
 
@@ -27,11 +27,9 @@ export default class Virtual extends PIXI.Container {
 
         this._videoElement = document.createElement('video');
 
-        this._facemesh = new FaceMesh({
-            locateFile: (file) => {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-            }
-        });
+        this._facemesh = new FaceMesh({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+        }});
 
         this._initModel();
 
@@ -275,10 +273,9 @@ export default class Virtual extends PIXI.Container {
         const camera = new Camera(this._videoElement, {
             onFrame: async () => {
                 await this._facemesh.send({ image: this._videoElement });
-            },
-            width: 1280,
-            height: 720
+            }
         });
+
         camera.start();
     }
 

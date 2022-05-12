@@ -15,28 +15,30 @@ export class SourcesWrapper {
 
         this._sources = [];
 
-        this.focusBox = new FocusBox(this._WBS);
-        this.focusBox.zIndex = 2;
+        this._sourceCreated = null;
 
-        this._parentScene.addChild(this.focusBox);
+        // this.focusBox = new FocusBox(this._WBS);
+        // this.focusBox.zIndex = 2;
+
+        // this._parentScene.addChild(this.focusBox);
     }
 
-    async createVirtualModel(sourcePath) {
+    async createVirtualModel(url) {
         const source = new Virtual(this._WBS, this);
         
-        await source.loadModel(sourcePath);
+        await source.loadModel(url);
 
         source.zIndex = 2;
 
-        return source;
+        this._sourceCreated = source;
     }
 
-    createImageSource(sourcePath) {
-        const sourceTexture = PIXI.Texture.from(sourcePath);
+    createImageSource(url) {
+        const sourceTexture = PIXI.Texture.from(url);
 
         const source = new Image(this._WBS, this, sourceTexture);
 
-        return source;
+        this._sourceCreated = source;
     }
 
     async createVideoSource() {
@@ -46,7 +48,7 @@ export class SourcesWrapper {
 
         const source = new Video(this._WBS, this, sourceTexture);
 
-        return source;
+        this._sourceCreated = source;
     }
 
     createTextSource(text, style) {
@@ -54,16 +56,12 @@ export class SourcesWrapper {
         
         const source = new Text(this._WBS, this, text, style);
 
-        return source;
+        this._sourceCreated = source;
     }
 
-    addSource(source) {
-        this._sources.push(source);
-        this._parentScene.addChild(source);
-    }
-
-    getSource(sourceIndex) {
-        return this._sources[sourceIndex];
+    addSource() {
+        this._sources.push(this._sourceCreated);
+        this._parentScene.addChild(this._sourceCreated);
     }
 
     removeSource(sourceIndex) {

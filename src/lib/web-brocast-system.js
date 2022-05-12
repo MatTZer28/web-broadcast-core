@@ -50,6 +50,10 @@ export class WebBroadcastSystem {
         this._pixiApp.stage.addChild(child);
     }
 
+    removeStageChild(child) {
+        this._pixiApp.stage.removeChild(child);
+    }
+
     setCursor(mode) {
         this._pixiApp.view.style.cursor = mode;
     }

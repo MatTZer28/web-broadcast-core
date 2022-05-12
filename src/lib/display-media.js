@@ -1,4 +1,4 @@
-export default class DisplayMedia {
+export class DisplayMedia {
     constructor() {
         this._displayMediaOptions = {
             video: {

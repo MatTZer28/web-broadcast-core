@@ -1,6 +1,6 @@
-import * as PIXI from 'pixi.js'
+const PIXI = require('pixi.js');
 
-export default class Text extends PIXI.Container {
+export class Text extends PIXI.Container {
     constructor(WBS, sourceWrapper, text, style) {
         super();
 

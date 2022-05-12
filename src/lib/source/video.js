@@ -1,6 +1,6 @@
-import * as PIXI from 'pixi.js'
+const PIXI = require('pixi.js');
 
-export default class Video extends PIXI.Container {
+export class Video extends PIXI.Container {
     constructor(WBS, sourceWrapper, texture) {
         super();
 

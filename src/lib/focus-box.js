@@ -1,8 +1,8 @@
-import Video from '../lib/source/video';
+const { Video } = require('../lib/source/video');
 
-import * as PIXI from 'pixi.js'
+const PIXI = require('pixi.js');
 
-export default class FocusBox extends PIXI.Container {
+export class FocusBox extends PIXI.Container {
     constructor(WBS) {
         super();
 

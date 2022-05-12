@@ -5,17 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "dev": "webpack serve",
-    "webpack-version": "webpack -v",
-    "node-version": "node -v"
+    "build": "webpack --config config/webpack.config.js",
+    "dev": "webpack serve --open --config config/webpack.config.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "kalidokit": "^1.1.5",
     "pixi-live2d-display": "^0.3.1",
-    "pixi.js": "^5.3.6"
+    "pixi.js": "^6.3.2"
   },
   "devDependencies": {
     "source-map-loader": "^3.0.1",

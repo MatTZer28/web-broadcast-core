@@ -1,11 +1,10 @@
-import * as PIXI from 'pixi.js';
 import * as Kalidokit from 'kalidokit';
 
-window.PIXI = PIXI;
+const PIXI = require('pixi.js');
 
-const { Live2DModel } = require('pixi-live2d-display');
+// const { Live2DModel } = require('pixi-live2d-display');
 
-export default class Virtual extends PIXI.Container {
+export class Virtual extends PIXI.Container {
     constructor(WBS, sourceWrapper) {
         super();
 

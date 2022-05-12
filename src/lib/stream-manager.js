@@ -1,4 +1,4 @@
-export default class StreamManager {
+export class StreamManager {
     constructor(canvas, fps, vbps, abps) {
         this._canvas = canvas;
 

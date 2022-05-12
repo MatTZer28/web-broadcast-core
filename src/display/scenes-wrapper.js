@@ -1,6 +1,6 @@
-import Scene from '../lib/scene';
+const { Scene } = require('../lib/scene');
 
-export default class ScenesWrapper {
+export class ScenesWrapper {
     constructor(WBS) {
         this._WBS = WBS;
         

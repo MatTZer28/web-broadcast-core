@@ -1,13 +1,13 @@
-import FocusBox from '../lib/focus_box';
-import Virtual from '../lib/source/virtual';
-import Image from '../lib/source/image';
-import Video from '../lib/source/video';
-import Text from '../lib/source/text';
-import DisplayMedia from '../lib/display_media';
+const { FocusBox } = require('../lib/focus-box');
+const { Virtual } = require('../lib/source/virtual');
+const { Image } = require('../lib/source/image');
+const { Video } = require('../lib/source/video');
+const { Text } = require('../lib/source/text');
+const { DisplayMedia } = require('../lib/display-media');
 
-import * as PIXI from 'pixi.js'
+const PIXI = require('pixi.js');
 
-export default class SourcesWrapper {
+export class SourcesWrapper {
     constructor(WBS, parentScene) {
         this._WBS = WBS;
 

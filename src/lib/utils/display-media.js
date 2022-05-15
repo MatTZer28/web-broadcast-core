@@ -1,4 +1,4 @@
-export class DisplayMedia {
+export default class DisplayMedia {
     constructor() {
         this._displayMediaOptions = {
             video: {
@@ -6,16 +6,15 @@ export class DisplayMedia {
               frameRate: { ideal: 60, max: 60 }
             },
             audio: true
-          };
+        };
     }
 
-    async createVideoTexture() { 
+    async createMediaStream() { 
       const mediaDevices = navigator.mediaDevices;
 
-      const videoElement = document.createElement('video');
-      videoElement.srcObject = await mediaDevices.getDisplayMedia(this._displayMediaOptions);
-
-      return videoElement;
+      const mediaStream = await mediaDevices.getDisplayMedia(this._displayMediaOptions);
+      
+      return mediaStream;
     }
 
     closeMediaStream() {

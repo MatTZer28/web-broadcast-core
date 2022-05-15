@@ -3,18 +3,20 @@ const { ScenesWrapper } = require('../display/scenes-wrapper');
 const PIXI = require('pixi.js');
 
 export class WebBroadcastSystem {
-    constructor(canvas, appWidth, appHeight) {
+    constructor(canvas, appWidth, appHeight, fps) {
         this.canvas = canvas;
 
         this.appWidth = appWidth;
 
         this.appHeight = appHeight;
-        
+
+        this.fps = fps;
+
         this._pixiApp = this._createApplication();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
         this._initBackground();
-        
+
         this._scenesWrapper = new ScenesWrapper(this);
     }
 
@@ -34,10 +36,9 @@ export class WebBroadcastSystem {
         this.background.width = this.appWidth;
         this.background.height = this.appHeight;
         this.background.tint = 0xD7D7D6;
-        this.background.interactive = true;
         this._pixiApp.stage.addChild(this.background);
     }
-    
+
     getApplication() {
         return this._pixiApp;
     }
@@ -55,6 +56,6 @@ export class WebBroadcastSystem {
     }
 
     setCursor(mode) {
-        this._pixiApp.view.style.cursor = mode;
+        self.postMessage({ type: 'setCursor', mode: mode });
     }
 }

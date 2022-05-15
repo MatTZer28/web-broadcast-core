@@ -1,4 +1,4 @@
-const { SourcesWrapper } = require('../display/sources-wrapper');
+const { SourcesWrapper } = require('../../display/sources-wrapper');
 
 const PIXI = require('pixi.js');
 

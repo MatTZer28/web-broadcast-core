@@ -1,11 +1,18 @@
 import * as Kalidokit from 'kalidokit';
 
+// importScripts(new URL('../live/live2dcubismcore.js', import.meta.url));
+// importScripts(new URL('../live/live2d.min.js', import.meta.url));
+// importScripts(new URL('../face_mesh.js', import.meta.url));
+// importScripts(new URL('../camera_utils.js', import.meta.url));
+
 const PIXI = require('pixi.js');
+ 
+window.PIXI = PIXI;
 
 // const { Live2DModel } = require('pixi-live2d-display');
 
 export class Virtual extends PIXI.Container {
-    constructor(WBS, sourceWrapper) {
+    constructor(WBS, sourceWrapper, id) {
         super();
 
         this._dragging = false;
@@ -15,6 +22,8 @@ export class Virtual extends PIXI.Container {
         this._WBS = WBS;
 
         this._sourceWrapper = sourceWrapper;
+
+        this._id = id;
 
         this._blueBox = new PIXI.Graphics();
     }
@@ -32,11 +41,7 @@ export class Virtual extends PIXI.Container {
 
         this._initModel();
 
-        this._setModelInteraction();
-
-        this._setBackgroundInteraction();
-
-        this._setGlobalInteraction();
+        this._setMouseEventListener();
 
         this._addToContainer();
 
@@ -51,16 +56,84 @@ export class Virtual extends PIXI.Container {
         this._focused = false;
     }
 
-    _setModelInteraction() {
-        this.setInteractiveState(true);
-        this._model.on("mousedown", this._modelOnMouseDown, this);
-        this._model.on("mousemove", this._modelOnMouseMove, this);
-        this._model.on("mouseup", this._modelOnMouseUp, this);
-        this._model.on("mouseover", this._modelOnMouseOver, this);
-        this._model.on("mouseout", this._modelOnMouseOut, this);
+    _setMouseEventListener() {
+        this._setOnMouseDownEventListener();
+        this._setOnMouseMoveEventListener();
+        this._setOnMouseUpEventListener();
+        this._setOnMouseOverEventListener();
+        this._setOnMouseOutEventListener();
     }
 
-    _modelOnMouseDown(event) {
+    _setOnMouseDownEventListener() {
+        self.addEventListener("onmousedown", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            const xLeft = this._model.x - this._model.width / 2 + 7;
+            const xRight = this._model.x + this._model.width / 2 - 7;
+            const yTop = this._model.y - this._model.height / 2 + 7;
+            const yBottom = this._model.y + this._model.height / 2 - 7;
+
+            const isInX = xLeft <= posX && xRight >= posX;
+            const isInY = yTop <= posY && yBottom >= posY;
+            const isInside = isInX && isInY;
+
+            if (isInside) this._modelOnMouseDown(posX, posY);
+        });
+    }
+
+    _setOnMouseMoveEventListener() {
+        self.addEventListener("onmousemove", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            this._modelOnMouseMove(posX, posY);
+        });
+    }
+
+    _setOnMouseUpEventListener() {
+        self.addEventListener("onmouseup", (e) => {
+            this._modelOnMouseUp();
+        });
+    }
+
+    _setOnMouseOverEventListener() {
+        self.addEventListener("onmousemove", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            const xLeft = this._model.x - this._model.width / 2 + 7;
+            const xRight = this._model.x + this._model.width / 2 - 7;
+            const yTop = this._model.y - this._model.height / 2 + 7;
+            const yBottom = this._model.y + this._model.height / 2 - 7;
+
+            const isInX = xLeft <= posX && xRight >= posX;
+            const isInY = yTop <= posY && yBottom >= posY;
+            const isInside = isInX && isInY;
+
+            if (isInside) this._modelOnMouseOver();
+        });
+    }
+
+    _setOnMouseOutEventListener() {
+        self.addEventListener("onmousemove", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            const xLeft = this._model.x - this._model.width / 2 + 7;
+            const xRight = this._model.x + this._model.width / 2 - 7;
+            const yTop = this._model.y - this._model.height / 2 + 7;
+            const yBottom = this._model.y + this._model.height / 2 - 7;
+
+            const isOutX = xLeft > posX || xRight < posX;
+            const isOutY = yTop > posY || yBottom < posY;
+            const isOutside = isOutX || isOutY;
+
+            if (isOutside) this._modelOnMouseOut();
+        });
+    }
+
+    _modelOnMouseDown(posX, posY) {
         this._blueBox.clear();
         this._sourceWrapper.focusBox.setFocusedTarget(this);
         this._showFocusBox();
@@ -71,10 +144,9 @@ export class Virtual extends PIXI.Container {
         this._dragging = true;
 
         this._sourceWrapper.unfocusedWithout(this, false);
-        this._sourceWrapper.disableInteractiveWithout(this, false);
 
-        this._model.prevInteractX = event.data.global.x;
-        this._model.prevInteractY = event.data.global.y;
+        this._model.prevInteractX = posX;
+        this._model.prevInteractY = posY;
     }
 
     setDragging(state) {
@@ -90,16 +162,16 @@ export class Virtual extends PIXI.Container {
         }
     }
 
-    _modelOnMouseMove(event) {
+    _modelOnMouseMove(posX, posY) {
         if (this._dragging) {
-            const deltaX = event.data.global.x - this._model.prevInteractX;
-            const deltaY = event.data.global.y - this._model.prevInteractY;
+            const deltaX = posX - this._model.prevInteractX;
+            const deltaY = posY - this._model.prevInteractY;
 
             this._moveModel(deltaX, deltaY);
             this._sourceWrapper.focusBox.moveFocusBox(deltaX, deltaY);
 
-            this._model.prevInteractX = event.data.global.x;
-            this._model.prevInteractY = event.data.global.y;
+            this._model.prevInteractX = posX;
+            this._model.prevInteractY = posY;
         }
     }
 
@@ -108,15 +180,13 @@ export class Virtual extends PIXI.Container {
         this._model.y = this._model.y + deltaY;
     }
 
-    _modelOnMouseUp(event) {
+    _modelOnMouseUp() {
         this._dragging = false;
-
-        this._sourceWrapper.disableInteractiveWithout(this, true);
 
         this._WBS.setCursor("auto");
     }
 
-    _modelOnMouseOver(event) {
+    _modelOnMouseOver() {
         if (!this._focused) {
             this._drawBlueBox();
         }
@@ -127,37 +197,22 @@ export class Virtual extends PIXI.Container {
         this._blueBox.drawShape(this._model.getBounds());
     }
 
-    _modelOnMouseOut(event) {
+    _modelOnMouseOut() {
         if (!this._focused) {
             this._blueBox.clear();
         }
     }
 
-    _setBackgroundInteraction() {
-        this._WBS.background.on('click', (event) => {
-            if (!this._isClickInsideModel(event.data.global.x, event.data.global.y)) {
-                this._focused = false;
-                this._sourceWrapper.focusBox.resetFocusBox();
-            }
-        }, this);
-    }
-
-    _isClickInsideModel(x, y) {
-        const isBiggerThanLeft = (x >= this._model.x - (this._model.width / 2));
-        const isSmallerThanRight = (x <= this._model.x + (this._model.width / 2));
+    isClickInsideSprite(x, y) {
+        const isBiggerThanLeft = (x >= this._model.x - (this._model.width / 2) - 8);
+        const isSmallerThanRight = (x <= this._model.x + (this._model.width / 2) + 8);
         const isInsideModelX = (isBiggerThanLeft && isSmallerThanRight);
 
-        const isBiggerThanTop = (y >= this._model.y - (this._model.height / 2));
-        const isSmallerThanBottom = (y <= this._model.y + (this._model.height / 2));
+        const isBiggerThanTop = (y >= this._model.y - (this._model.height / 2) - 8);
+        const isSmallerThanBottom = (y <= this._model.y + (this._model.height / 2) + 8);
         const isInsideModelY = (isBiggerThanTop && isSmallerThanBottom);
 
         return (isInsideModelX && isInsideModelY);
-    }
-
-    _setGlobalInteraction() {
-        document.body.addEventListener('mouseup', e => {
-            this._dragging = null;
-        });
     }
 
     _addToContainer() {
@@ -280,10 +335,6 @@ export class Virtual extends PIXI.Container {
 
     setOnFoucsState(state) {
         this._focused = state;
-    }
-
-    setInteractiveState(state) {
-        this._model.interactive = state;
     }
 
     getFocusState() {

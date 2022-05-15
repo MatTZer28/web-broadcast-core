@@ -6,6 +6,10 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: 'web-boardcast-core.bundle.js',
+        chunkFilename(pathData) {
+            const outDir = pathData.chunk.name === 'pdf.worker' ? 'worker/' : '';
+            return outDir + '[contenthash].bundle.js';
+        },
         library: {
             name: 'webBroadcastCore',
             type: 'umd',
@@ -24,5 +28,6 @@ module.exports = {
                 use: ['source-map-loader'],
             }
         ],
-    }
+    },
+    ignoreWarnings: [/Failed to parse source map/],
 }

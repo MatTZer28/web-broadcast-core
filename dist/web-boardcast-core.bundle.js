@@ -26,14 +26,55 @@ return /******/ (() => { // webpackBootstrap
   \**********************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"init\": () => (/* binding */ init)\n/* harmony export */ });\nfunction init(canvas, width, height) {\n    const offscreen = canvas.transferControlToOffscreen();\n        \n    const worker = new Worker(new URL(/* worker import */ __webpack_require__.p + __webpack_require__.u(\"src_worker_js\"), __webpack_require__.b));\n\n    worker.postMessage({width: width, height: height, canvas: offscreen}, [offscreen]);\n}\n\n//# sourceURL=webpack://webBroadcastCore/./src/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"addSource\": () => (/* binding */ addSource),\n/* harmony export */   \"createImageSource\": () => (/* binding */ createImageSource),\n/* harmony export */   \"createScene\": () => (/* binding */ createScene),\n/* harmony export */   \"createTextSource\": () => (/* binding */ createTextSource),\n/* harmony export */   \"createVideoSource\": () => (/* binding */ createVideoSource),\n/* harmony export */   \"createVirtualModel\": () => (/* binding */ createVirtualModel),\n/* harmony export */   \"init\": () => (/* binding */ init),\n/* harmony export */   \"removeScene\": () => (/* binding */ removeScene),\n/* harmony export */   \"removeSource\": () => (/* binding */ removeSource),\n/* harmony export */   \"selectScene\": () => (/* binding */ selectScene)\n/* harmony export */ });\n/* harmony import */ var _lib_display_media_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./lib/display-media.js */ \"./src/lib/display-media.js\");\n/* harmony import */ var _lib_stream_manager_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lib/stream-manager.js */ \"./src/lib/stream-manager.js\");\n\r\n\r\n\r\nlet worker;\r\n\r\nconst isVideoRemoved = {};\r\n\r\nfunction init(div, canvas, width, height, fps) {\r\n    const offscreen = canvas.transferControlToOffscreen();\r\n\r\n    worker = new Worker(new URL(/* worker import */ __webpack_require__.p + __webpack_require__.u(\"src_worker_js\"), __webpack_require__.b));\r\n\r\n    worker.postMessage(\r\n        {\r\n            type: 'init',\r\n            width: width,\r\n            height: height,\r\n            fps: fps,\r\n            canvas: offscreen\r\n        },\r\n        [offscreen]\r\n    );\r\n\r\n    worker.addEventListener('message', (e) => {\r\n        switch (e.data.type) {\r\n            case 'setCursor':\r\n                div.style.cursor = e.data.mode;\r\n                break;\r\n            case 'removeVideo':\r\n                isVideoRemoved[e.data.id] = true;\r\n                break;\r\n            default:\r\n                break;\r\n        }\r\n    })\r\n\r\n    let isInsideDiv = false;\r\n\r\n    div.addEventListener('mousemove', (e) => {\r\n        if (!isInsideDiv) return;\r\n\r\n        worker.postMessage({ type: 'mouseMove', posX: _getPosX(width, e), posY: _getPosY(height, e) });\r\n    });\r\n\r\n    div.addEventListener('mouseenter', (e) => {\r\n        isInsideDiv = true;\r\n    })\r\n\r\n    div.addEventListener('mouseleave', (e) => {\r\n        isInsideDiv = false;\r\n    })\r\n\r\n    div.addEventListener('mousedown', (e) => {\r\n        worker.postMessage({ type: 'mouseDown', posX: _getPosX(width, e), posY: _getPosY(height, e) });\r\n    });\r\n\r\n    div.addEventListener('mouseup', (e) => {\r\n        worker.postMessage({ type: 'mouseUp', posX: _getPosX(width, e), posY: _getPosY(height, e) });\r\n    });\r\n\r\n    // const streamManager = new StreamManager(canvas, 60, 1000000, 1000000);\r\n    \r\n    // streamManager.startRecording();\r\n\r\n    // setTimeout(() => {\r\n    //     streamManager.getRecorder().addEventListener('dataavailable', (e) => {\r\n    //         const video = document.createElement('video');\r\n    //         video.src = URL.createObjectURL(e.data);\r\n    //         video.style.width = '100%';\r\n    //         video.style.height = '100%';\r\n    //         document.body.appendChild(video);\r\n    //     });\r\n    //     streamManager.stopRecording();\r\n    // }, 30000);\r\n}\r\n\r\nfunction _getPosX(width, e) {\r\n    let ratioWidth = width / div.offsetWidth;\r\n    let posX = (e.clientX - e.target.offsetLeft) * ratioWidth;\r\n    return posX\r\n}\r\n\r\nfunction _getPosY(height, e) {\r\n    let ratioHeight = height / div.offsetHeight;\r\n    let posY = (e.clientY - e.target.offsetTop) * ratioHeight;\r\n    return posY\r\n}\r\n\r\nfunction createScene() {\r\n    worker.postMessage({ type: 'createScene' });\r\n}\r\n\r\nfunction removeScene(index) {\r\n    worker.postMessage({ type: 'removeScene', sceneIndex: index });\r\n}\r\n\r\nfunction selectScene(index) {\r\n    worker.postMessage({ type: 'selectScene', sceneIndex: index });\r\n}\r\n\r\nfunction createVirtualModel(id, url) {\r\n    worker.postMessage({ type: 'createVirtualModel', id: id, url: url });\r\n}\r\n\r\nfunction createImageSource(id, url) {\r\n    const image = new Image();\r\n    image.src = url;\r\n\r\n    image.onload = () => {\r\n        createImageBitmap(image).then((bitmap) => {\r\n            worker.postMessage({ type: 'createImageSource', id: id, bitmap: bitmap }, [bitmap]);\r\n        });\r\n    }\r\n}\r\n\r\nasync function createVideoSource(id) {\r\n    const displayMedia = new _lib_display_media_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"]();\r\n\r\n    const mediaStream = await displayMedia.createMediaStream();\r\n\r\n    const imageCapture = new ImageCapture(mediaStream.getVideoTracks()[0]);\r\n\r\n    worker.postMessage({ type: 'createVideoSource', id: id });\r\n\r\n    isVideoRemoved[id] = false;\r\n\r\n    imageCapture.grabFrame().then((bitmap) => {\r\n        worker.postMessage({ type: 'updateVideoSource', id: id, bitmap: bitmap }, [bitmap]);\r\n        _updateVideoSource(imageCapture, id);\r\n    })\r\n}\r\n\r\nfunction _updateVideoSource(imageCapture, id) {\r\n    imageCapture.grabFrame().then((bitmap) => {\r\n        if (isVideoRemoved[id]) return;\r\n\r\n        worker.postMessage({ type: 'updateVideoSource', id: id, bitmap: bitmap }, [bitmap]);\r\n        \r\n        _updateVideoSource(imageCapture, id);\r\n    })\r\n}\r\n\r\nfunction createTextSource(id, text, style) {\r\n    worker.postMessage({ type: 'createTextSource', id: id, text: text, style: style });\r\n}\r\n\r\nfunction addSource() {\r\n    worker.postMessage({ type: 'addSource' });\r\n}\r\n\r\nfunction removeSource(id) {\r\n    worker.postMessage({ type: 'removeSource', id: id });\r\n}\n\n//# sourceURL=webpack://webBroadcastCore/./src/index.js?");
+
+/***/ }),
+
+/***/ "./src/lib/display-media.js":
+/*!**********************************!*\
+  !*** ./src/lib/display-media.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ DisplayMedia)\n/* harmony export */ });\nclass DisplayMedia {\r\n    constructor() {\r\n        this._displayMediaOptions = {\r\n            video: {\r\n              cursor: \"always\",\r\n              frameRate: { ideal: 60, max: 60 }\r\n            },\r\n            audio: true\r\n        };\r\n    }\r\n\r\n    async createMediaStream() { \r\n      const mediaDevices = navigator.mediaDevices;\r\n\r\n      const mediaStream = await mediaDevices.getDisplayMedia(this._displayMediaOptions);\r\n      \r\n      return mediaStream;\r\n    }\r\n\r\n    closeMediaStream() {\r\n      const tracks = this._mediaStream.getTracks();\r\n      \r\n      tracks.forEach(track => track.stop());\r\n    }\r\n}\n\n//# sourceURL=webpack://webBroadcastCore/./src/lib/display-media.js?");
+
+/***/ }),
+
+/***/ "./src/lib/stream-manager.js":
+/*!***********************************!*\
+  !*** ./src/lib/stream-manager.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ StreamManager)\n/* harmony export */ });\nclass StreamManager {\r\n    constructor(canvas, fps, vbps, abps) {\r\n        this._canvas = canvas;\r\n\r\n        this._fps = fps;\r\n\r\n        this._vbps = vbps;\r\n\r\n        this._abps = abps;\r\n\r\n        this._recorder = new MediaRecorder(\r\n            this._canvas.captureStream(this._fps),\r\n            {\r\n                mimeType: 'video/webm;codecs=h264',\r\n                videoBitsPerSecond: this._vbps,\r\n                audioBitsPerSecond: this._abps\r\n            }\r\n        );\r\n    }\r\n\r\n    startRecording() {\r\n        this._recorder.start();\r\n    }\r\n\r\n    stopRecording() {\r\n        this._recorder.stop();\r\n    }\r\n\r\n    getRecorder() {\r\n        return this._recorder;\r\n    }\r\n}\n\n//# sourceURL=webpack://webBroadcastCore/./src/lib/stream-manager.js?");
 
 /***/ })
 
 /******/ 	});
 /************************************************************************/
-/******/ 	// The require scope
-/******/ 	var __webpack_require__ = {};
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
 /******/ 	
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = __webpack_modules__;
@@ -55,8 +96,10 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 	(() => {
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
+/******/ 			// return url for filenames not based on template
+/******/ 			if (chunkId === "src_worker_js") return "e0e06f4fbb4c08c73a75.bundle.js";
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + ".web-boardcast-core.bundle.js";
+/******/ 			return undefined;
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -139,8 +182,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = {};
-/******/ 	__webpack_modules__["./src/index.js"](0, __webpack_exports__, __webpack_require__);
+/******/ 	var __webpack_exports__ = __webpack_require__("./src/index.js");
 /******/ 	
 /******/ 	return __webpack_exports__;
 /******/ })()

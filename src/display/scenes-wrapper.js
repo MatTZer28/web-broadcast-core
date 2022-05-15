@@ -1,4 +1,4 @@
-const { Scene } = require('../lib/scene');
+const { Scene } = require('../lib/scene/scene');
 
 export class ScenesWrapper {
     constructor(WBS) {

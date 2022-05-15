@@ -1,7 +1,7 @@
 const PIXI = require('pixi.js');
 
 export class Video extends PIXI.Container {
-    constructor(WBS, sourceWrapper, texture) {
+    constructor(WBS, sourceWrapper, id, texture) {
         super();
 
         this._dragging = false;
@@ -12,6 +12,8 @@ export class Video extends PIXI.Container {
 
         this._sourceWrapper = sourceWrapper;
 
+        this._id = id;
+
         this._texture = texture;
 
         this._sprite = PIXI.Sprite.from(this._texture);
@@ -21,11 +23,7 @@ export class Video extends PIXI.Container {
 
         this._initSprite();
 
-        this._setSpriteInteraction();
-
-        this._setBackgroundInteraction();
-
-        this._setGlobalInteraction();
+        this._setMouseEventListener();
 
         this._setTextureUpdateListener();
         
@@ -34,21 +32,89 @@ export class Video extends PIXI.Container {
 
     _initSprite() {
         this._sprite.anchor.set(0.5);
-        this._sprite.x = this._WBS.appWidth / 2;
-        this._sprite.y = this._WBS.appHeight / 2;
+        this._sprite.x = this._WBS.appWidth / 2 + 1; // add one just to avoid the weird line (don't konw how the line appears)
+        this._sprite.y = this._WBS.appHeight / 2 + 1;
         this._focused = false;
     }
 
-    _setSpriteInteraction() {
-        this.setInteractiveState(true);
-        this._sprite.on("mousedown", this._spriteOnMouseDown, this);
-        this._sprite.on("mousemove", this._spriteOnMouseMove, this);
-        this._sprite.on("mouseup", this._spriteOnMouseUp, this);
-        this._sprite.on("mouseover", this._spriteOnMouseOver, this);
-        this._sprite.on("mouseout", this._spriteOnMouseOut, this);
+    _setMouseEventListener() {
+        this._setOnMouseDownEventListener();
+        this._setOnMouseMoveEventListener();
+        this._setOnMouseUpEventListener();
+        this._setOnMouseOverEventListener();
+        this._setOnMouseOutEventListener();
     }
 
-    _spriteOnMouseDown(event) {
+    _setOnMouseDownEventListener() {
+        self.addEventListener("onmousedown", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            const xLeft = this._sprite.x - this._sprite.width / 2 + 7;
+            const xRight = this._sprite.x + this._sprite.width / 2 - 7;
+            const yTop = this._sprite.y - this._sprite.height / 2 + 7;
+            const yBottom = this._sprite.y + this._sprite.height / 2 - 7;
+
+            const isInX = xLeft <= posX && xRight >= posX;
+            const isInY = yTop <= posY && yBottom >= posY;
+            const isInside = isInX && isInY;
+
+            if (isInside) this._spriteOnMouseDown(posX, posY);
+        });
+    }
+
+    _setOnMouseMoveEventListener() {
+        self.addEventListener("onmousemove", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            this._spriteOnMouseMove(posX, posY);
+        });
+    }
+
+    _setOnMouseUpEventListener() {
+        self.addEventListener("onmouseup", (e) => {
+            this._spriteOnMouseUp();
+        });
+    }
+
+    _setOnMouseOverEventListener() {
+        self.addEventListener("onmousemove", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            const xLeft = this._sprite.x - this._sprite.width / 2 + 7;
+            const xRight = this._sprite.x + this._sprite.width / 2 - 7;
+            const yTop = this._sprite.y - this._sprite.height / 2 + 7;
+            const yBottom = this._sprite.y + this._sprite.height / 2 - 7;
+
+            const isInX = xLeft <= posX && xRight >= posX;
+            const isInY = yTop <= posY && yBottom >= posY;
+            const isInside = isInX && isInY;
+
+            if (isInside) this._spriteOnMouseOver();
+        });
+    }
+
+    _setOnMouseOutEventListener() {
+        self.addEventListener("onmousemove", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            const xLeft = this._sprite.x - this._sprite.width / 2 + 7;
+            const xRight = this._sprite.x + this._sprite.width / 2 - 7;
+            const yTop = this._sprite.y - this._sprite.height / 2 + 7;
+            const yBottom = this._sprite.y + this._sprite.height / 2 - 7;
+
+            const isOutX = xLeft > posX || xRight < posX;
+            const isOutY = yTop > posY || yBottom < posY;
+            const isOutside = isOutX || isOutY;
+
+            if (isOutside) this._spriteOnMouseOut();
+        });
+    }
+
+    _spriteOnMouseDown(posX, posY) {
         this._blueBox.clear();
         this._sourceWrapper.focusBox.setFocusedTarget(this);
         this._showFocusBox();
@@ -59,10 +125,9 @@ export class Video extends PIXI.Container {
         this._dragging = true;
 
         this._sourceWrapper.unfocusedWithout(this, false);
-        this._sourceWrapper.disableInteractiveWithout(this, false);
 
-        this._sprite.prevInteractX = event.data.global.x;
-        this._sprite.prevInteractY = event.data.global.y;
+        this._sprite.prevInteractX = posX;
+        this._sprite.prevInteractY = posY;
     }
 
     setDragging(state) {
@@ -78,16 +143,16 @@ export class Video extends PIXI.Container {
         }
     }
 
-    _spriteOnMouseMove(event) {
+    _spriteOnMouseMove(posX, posY) {
         if (this._dragging) {
-            const deltaX = event.data.global.x - this._sprite.prevInteractX;
-            const deltaY = event.data.global.y - this._sprite.prevInteractY;
+            const deltaX = posX - this._sprite.prevInteractX;
+            const deltaY = posY - this._sprite.prevInteractY;
 
             this._moveSprite(deltaX, deltaY);
             this._sourceWrapper.focusBox.moveFocusBox(deltaX, deltaY);
 
-            this._sprite.prevInteractX = event.data.global.x;
-            this._sprite.prevInteractY = event.data.global.y;
+            this._sprite.prevInteractX = posX;
+            this._sprite.prevInteractY = posY;
         }
     }
 
@@ -96,15 +161,13 @@ export class Video extends PIXI.Container {
         this._sprite.y = this._sprite.y + deltaY;
     }
 
-    _spriteOnMouseUp(event) {
+    _spriteOnMouseUp() {
         this._dragging = false;
-
-        this._sourceWrapper.disableInteractiveWithout(this, true);
 
         this._WBS.setCursor("auto");
     }
 
-    _spriteOnMouseOver(event) {
+    _spriteOnMouseOver() {
         if (!this._focused) {
             this._drawBlueBox();
         }
@@ -115,37 +178,22 @@ export class Video extends PIXI.Container {
         this._blueBox.drawShape(this._sprite.getBounds());
     }
 
-    _spriteOnMouseOut(event) {
+    _spriteOnMouseOut() {
         if (!this._focused) {
             this._blueBox.clear();
         }
     }
 
-    _setBackgroundInteraction() {
-        this._WBS.background.on('click', (event) => {
-            if (!this._isClickInsideSprite(event.data.global.x, event.data.global.y)) {
-                this._focused = false;
-                this._sourceWrapper.focusBox.resetFocusBox();
-            }
-        }, this);
-    }
-
-    _isClickInsideSprite(x, y) {
-        const isBiggerThanLeft = (x >= this._sprite.x - (this._sprite.width / 2));
-        const isSmallerThanRight = (x <= this._sprite.x + (this._sprite.width / 2));
+    isClickInsideSprite(x, y) {
+        const isBiggerThanLeft = (x >= this._sprite.x - (this._sprite.width / 2) - 8);
+        const isSmallerThanRight = (x <= this._sprite.x + (this._sprite.width / 2) + 8);
         const isInsideSpriteX = (isBiggerThanLeft && isSmallerThanRight);
 
-        const isBiggerThanTop = (y >= this._sprite.y - (this._sprite.height / 2));
-        const isSmallerThanBottom = (y <= this._sprite.y + (this._sprite.height / 2));
+        const isBiggerThanTop = (y >= this._sprite.y - (this._sprite.height / 2) - 8);
+        const isSmallerThanBottom = (y <= this._sprite.y + (this._sprite.height / 2) + 8);
         const isInsideSpriteY = (isBiggerThanTop && isSmallerThanBottom);
 
         return (isInsideSpriteX && isInsideSpriteY);
-    }
-
-    _setGlobalInteraction() {
-        document.body.addEventListener('mouseup', e => {
-            this._dragging = null;
-        });
     }
 
     _setTextureUpdateListener() {
@@ -186,10 +234,6 @@ export class Video extends PIXI.Container {
 
     setOnFoucsState(state) {
         this._focused = state;
-    }
-
-    setInteractiveState(state) {
-        this._sprite.interactive = state;
     }
 
     getFocusState() {

@@ -1,9 +1,8 @@
-const { FocusBox } = require('../lib/focus-box');
+const { FocusBox } = require('../lib/utils/focus-box');
 const { Virtual } = require('../lib/source/virtual');
 const { Image } = require('../lib/source/image');
 const { Video } = require('../lib/source/video');
 const { Text } = require('../lib/source/text');
-const { DisplayMedia } = require('../lib/display-media');
 
 const PIXI = require('pixi.js');
 
@@ -15,72 +14,111 @@ export class SourcesWrapper {
 
         this._sources = [];
 
-        this._sourceCreated = null;
+        this._sourcesCreatedQueue = [];
 
-        // this.focusBox = new FocusBox(this._WBS);
-        // this.focusBox.zIndex = 2;
+        this._addSoucreCounter = 0;
 
-        // this._parentScene.addChild(this.focusBox);
+        this.focusBox = new FocusBox(this._WBS);
+        this.focusBox.zIndex = 2;
+
+        this._parentScene.addChild(this.focusBox);
+
+        this._setMouseEventListener();
     }
 
-    async createVirtualModel(url) {
-        const source = new Virtual(this._WBS, this);
-        
+    _setMouseEventListener() {
+        this._setOnMouseDownEventListener();
+    }
+
+    _setOnMouseDownEventListener() {
+        self.addEventListener("onmousedown", (e) => {
+            const posX = e.detail.position.x;
+            const posY = e.detail.position.y;
+
+            let isAnyFocused = false;
+
+            this._sources.forEach(source => {
+                if (source.isClickInsideSprite(posX, posY)) {
+                    isAnyFocused = true;
+                } else {
+                    source.setOnFoucsState(false);
+                }
+            });
+
+            if (!isAnyFocused) this.focusBox.resetFocusBox();
+        });
+    }
+
+    async createVirtualModel(id, url) {
+        this._sourceCreated = null;
+
+        const source = new Virtual(this._WBS, this, id);
+
         await source.loadModel(url);
 
         source.zIndex = 2;
 
-        this._sourceCreated = source;
+        this._sourcesCreatedQueue.push(source);
     }
 
-    createImageSource(url) {
-        const sourceTexture = PIXI.Texture.from(url);
+    createImageSource(id, canvas) {
+        this._sourceCreated = null;
 
-        const source = new Image(this._WBS, this, sourceTexture);
+        const sourceTexture = PIXI.Texture.from(canvas);
 
-        this._sourceCreated = source;
+        const source = new Image(this._WBS, this, id,  sourceTexture);
+
+        this._sourcesCreatedQueue.push(source);
     }
 
-    async createVideoSource() {
-        const displayMedia = new DisplayMedia();
+    createVideoSource(id, canvas) {
+        this._sourceCreated = null;
 
-        const sourceTexture = PIXI.Texture.from(await displayMedia.createVideoTexture());
+        canvas.texture = PIXI.Texture.from(canvas);
 
-        const source = new Video(this._WBS, this, sourceTexture);
+        const source = new Video(this._WBS, this, id, canvas.texture);
 
-        this._sourceCreated = source;
+        this._sourcesCreatedQueue.push(source);
     }
 
-    createTextSource(text, style) {
+    createTextSource(id, text, style) {
+        this._sourceCreated = null;
+
         style = style || {};
-        
-        const source = new Text(this._WBS, this, text, style);
 
-        this._sourceCreated = source;
+        const source = new Text(this._WBS, this, id, text, style);
+
+        this._sourcesCreatedQueue.push(source);
     }
 
     addSource() {
-        this._sources.push(this._sourceCreated);
-        this._parentScene.addChild(this._sourceCreated);
-    }
-
-    removeSource(sourceIndex) {
-        this._sources[sourceIndex].destroy();
-        this._sources.splice(sourceIndex, 1);
-    }
-
-    unfocusedWithout(source, state) {
-        this._sources.forEach(s=> {
-            if (s !== source) {
-                s.setOnFoucsState(state);
+        const interval = setInterval(() => {
+            if (this._sourcesCreatedQueue.length > 0) {
+                const source = this._sourcesCreatedQueue.shift();
+                this._sources.push(source);
+                this._parentScene.addChild(source);
+                clearInterval(interval);
             }
+        }, 100);
+    }
+
+    removeSource(id) {
+        this._sources.some((source) => {
+            if (source.id !== id) return false;
+
+            if (source instanceof Video) self.postMessage({ type: 'removeVideo', id: id });
+
+            source.destroy();
+            this._sources.splice(this._sources.indexOf(source), 1);
+
+            return true;
         });
     }
 
-    disableInteractiveWithout(source, state) {
+    unfocusedWithout(source, state) {
         this._sources.forEach(s => {
             if (s !== source) {
-                s.setInteractiveState(state);
+                s.setOnFoucsState(state);
             }
         });
     }

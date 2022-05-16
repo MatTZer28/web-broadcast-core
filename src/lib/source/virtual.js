@@ -1,15 +1,21 @@
 import * as Kalidokit from 'kalidokit';
 
-// importScripts(new URL('../live/live2dcubismcore.js', import.meta.url));
-// importScripts(new URL('../live/live2d.min.js', import.meta.url));
-// importScripts(new URL('../face_mesh.js', import.meta.url));
-// importScripts(new URL('../camera_utils.js', import.meta.url));
+importScripts(new URL('../live2d/live2dcubismcore.min.js', import.meta.url));
+importScripts(new URL('../live2d/live2d.min.js', import.meta.url));
+importScripts(new URL('../utils/face_mesh.js', import.meta.url));
+importScripts(new URL('../utils/camera_utils.js', import.meta.url));
+
+window.Live2DCubismCore = Live2DCubismCore;
+
+self.Live2DMotion = window.Live2DMotion;
+self.AMotion = window.AMotion;
+self.PhysicsHair = window.PhysicsHair;
 
 const PIXI = require('pixi.js');
  
 window.PIXI = PIXI;
 
-// const { Live2DModel } = require('pixi-live2d-display');
+const { Live2DModel } = require('pixi-live2d-display');
 
 export class Virtual extends PIXI.Container {
     constructor(WBS, sourceWrapper, id) {

@@ -1,4 +1,4 @@
-import Video from '../lib/source/video';
+import Video from '../source/video';
 
 import * as PIXI from 'pixi.js'
 

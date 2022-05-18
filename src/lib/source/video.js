@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 
 export default class Video extends PIXI.Container {
-    constructor(WBS, sourceWrapper, texture) {
+    constructor(WBS, sourceWrapper, id, texture) {
         super();
 
         this._dragging = false;
@@ -11,6 +11,8 @@ export default class Video extends PIXI.Container {
         this._WBS = WBS;
 
         this._sourceWrapper = sourceWrapper;
+        
+        this.id = id;
 
         this._texture = texture;
 

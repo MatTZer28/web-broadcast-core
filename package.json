@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack",
-    "dev": "webpack serve",
-    "webpack-version": "webpack -v",
-    "node-version": "node -v"
+    "build": "webpack --config ./config/webpack.config.js --mode production",
+    "dev": "webpack serve --open --config ./config/webpack.config.js"
   },
   "author": "",
   "license": "ISC",

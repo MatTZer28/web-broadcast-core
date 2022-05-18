@@ -1,9 +1,9 @@
-import FocusBox from '../lib/focus_box';
+import FocusBox from '../lib/utils/focus_box';
 import Virtual from '../lib/source/virtual';
 import Image from '../lib/source/image';
 import Video from '../lib/source/video';
 import Text from '../lib/source/text';
-import DisplayMedia from '../lib/display_media';
+import DisplayMedia from '../lib/utils/display_media';
 
 import * as PIXI from 'pixi.js'
 
@@ -21,38 +21,38 @@ export default class SourcesWrapper {
         this._parentScene.addChild(this.focusBox);
     }
 
-    async createVirtualModel(sourcePath) {
-        const source = new Virtual(this._WBS, this);
+    async createVirtualModel(id, url) {
+        const source = new Virtual(this._WBS, this, id);
         
-        await source.loadModel(sourcePath);
+        await source.loadModel(url);
 
         source.zIndex = 2;
 
         return source;
     }
 
-    createImageSource(sourcePath) {
-        const sourceTexture = PIXI.Texture.from(sourcePath);
+    createImageSource(id, url) {
+        const sourceTexture = PIXI.Texture.from(url);
 
-        const source = new Image(this._WBS, this, sourceTexture);
+        const source = new Image(this._WBS, this, id, sourceTexture);
 
         return source;
     }
 
-    async createVideoSource() {
+    async createVideoSource(id) {
         const displayMedia = new DisplayMedia();
 
         const sourceTexture = PIXI.Texture.from(await displayMedia.createVideoTexture());
 
-        const source = new Video(this._WBS, this, sourceTexture);
+        const source = new Video(this._WBS, this, id, sourceTexture);
 
         return source;
     }
 
-    createTextSource(text, style) {
+    createTextSource(id, text, style) {
         style = style || {};
         
-        const source = new Text(this._WBS, this, text, style);
+        const source = new Text(this._WBS, this, id, text, style);
 
         return source;
     }
@@ -66,9 +66,14 @@ export default class SourcesWrapper {
         return this._sources[sourceIndex];
     }
 
-    removeSource(sourceIndex) {
-        this._sources[sourceIndex].destroy();
-        this._sources.splice(sourceIndex, 1);
+    removeSource(id) {
+        this._sources.some((source) => {
+            if (source.id === id) {
+                this._parentScene.removeChild(source);
+                this._sources.splice(this._sources.indexOf(source), 1);
+                return true;
+            } else return false;
+        });
     }
 
     unfocusedWithout(source, state) {

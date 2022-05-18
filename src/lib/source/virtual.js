@@ -6,7 +6,7 @@ window.PIXI = PIXI;
 const { Live2DModel } = require('pixi-live2d-display');
 
 export default class Virtual extends PIXI.Container {
-    constructor(WBS, sourceWrapper) {
+    constructor(WBS, sourceWrapper, id) {
         super();
 
         this._dragging = false;
@@ -16,6 +16,8 @@ export default class Virtual extends PIXI.Container {
         this._WBS = WBS;
 
         this._sourceWrapper = sourceWrapper;
+
+        this.id = id;
 
         this._blueBox = new PIXI.Graphics();
     }

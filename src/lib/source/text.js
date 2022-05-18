@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 
 export default class Text extends PIXI.Container {
-    constructor(WBS, sourceWrapper, text, style) {
+    constructor(WBS, sourceWrapper, id, text, style) {
         super();
 
         this._dragging = false;
@@ -11,6 +11,8 @@ export default class Text extends PIXI.Container {
         this._WBS = WBS;
 
         this._sourceWrapper = sourceWrapper;
+
+        this.id = id;
 
         this._sprite = new PIXI.Text(text, style);
         this._sprite.name = 'sprite';

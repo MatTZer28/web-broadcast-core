@@ -1,5 +1,5 @@
 import ScenesWrapper from './display/scenes_wrapper';
-import StreamManager from './lib/stream_manager';
+import StreamManager from './lib/utils/stream_manager';
 
 import * as PIXI from 'pixi.js'
 
@@ -10,62 +10,17 @@ export class WebBroadcastSystem {
         this.appHeight = appHeight;
         
         this._pixiApp = this._createApplication();
-        //this._offTabRunning();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
         this._initBackground();
         
         this._scenesWrapper = new ScenesWrapper(this);
-
-        this._streamManager = new StreamManager(this._pixiApp.view, 60, 5971968, 160000);
-
-        // this._streamManager.startRecording();
-
-        // setTimeout(async () => {
-        //     this._streamManager.stopRecording();
-
-        //     this._streamManager.getRecorder().addEventListener('dataavailable', (e) => {
-        //         let video = document.querySelector('video');
-
-        //         let videoUrl = window.URL.createObjectURL(e.data);
-
-        //         video.src = videoUrl;
-        //     });
-        // }, 10000);
     }
 
     _createApplication() {
         return new PIXI.Application({
             width: this.appWidth,
             height: this.appHeight
-        });
-    }
-
-    _offTabRunning() {
-        const ticker = PIXI.Ticker.shared;
-
-        const renderer = PIXI.autoDetectRenderer();
-
-        const worker = new Worker(new URL('./lib/worker.js', import.meta.url));
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState == "hidden") {
-                //ticker.stop();
-                worker.postMessage('start');
-            } else {
-                worker.postMessage('stop');
-                //ticker.start();
-            }
-        });
-
-        worker.onmessage = (e) => {
-            if (e.data === 'tick') {
-                ticker.update();
-            }
-        };
-
-        ticker.add((time) => {
-            renderer.render(this._pixiApp.stage);
         });
     }
 

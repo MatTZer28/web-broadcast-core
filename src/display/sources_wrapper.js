@@ -62,11 +62,20 @@ export default class SourcesWrapper {
         this._parentScene.addChild(source);
     }
 
-    getSource(sourceIndex) {
-        return this._sources[sourceIndex];
+    getSourceByID(id) {
+        let result_source;
+
+        this._sources.some((source) => {
+            if (source.id === id) {
+                result_source = source;
+                return true;
+            } else return false;
+        });
+
+        return result_source;
     }
 
-    removeSource(id) {
+    removeSourceByID(id) {
         this._sources.some((source) => {
             if (source.id === id) {
                 this._parentScene.removeChild(source);

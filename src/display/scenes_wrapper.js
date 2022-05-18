@@ -7,25 +7,48 @@ export default class ScenesWrapper {
         this._scenes = [];
     }
 
-    createScene() {
-        const scene = new Scene(this._WBS);
+    createScene(id) {
+        const scene = new Scene(this._WBS, id);
 
         this._scenes.push(scene);
-        this._WBS.addStageChild(scene);
 
         return scene;
+    }
+    
+    focusScene(id) {
+        this._scenes.some((scene) => {
+            if (scene.id === id) {
+                this._WBS.clearStageChild();
+                this._WBS.addStageChild(scene);
+                return true;
+            } else return false;
+        });
     }
 
     getScenesLength() {
         return this._scenes.length;
     }
 
-    getScene(sceneIndex) {
-        return this._scenes[sceneIndex];
+    getSceneByID(id) {
+        let result_scene;
+
+        this._scenes.some((scene) => {
+            if (scene.id === id) {
+                result_scene = scene;
+                return true;
+            } else return false;
+        });
+
+        return result_scene;
     }
 
-    removeScene(sceneIndex) {
-        this._scenes[sceneIndex].destroy();
-        this._scenes.splice(sceneIndex, 1);
+    removeSceneByID(id) {
+        this._scenes.some((scene) => {
+            if (scene.id === id) {
+                this._WBS.removeChild(scene);
+                this._scenes.splice(this._scenes.indexOf(scene), 1);
+                return true;
+            } else return false;
+        });
     }
 }

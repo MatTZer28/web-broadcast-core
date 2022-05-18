@@ -52,6 +52,18 @@ export class WebBroadcastSystem {
         this._pixiApp.stage.addChild(child);
     }
 
+    clearStageChild() {
+        if (this._pixiApp.stage.children.length > 0) {
+            this._pixiApp.stage.removeChild(this._pixiApp.stage.children[0]);
+        }
+    }
+
+    removeStageChild(child) {
+        if (this._pixiApp.stage.children.includes(child)) {
+            this._pixiApp.stage.removeChild(child);
+        }
+    }
+
     setCursor(mode) {
         this._pixiApp.view.style.cursor = mode;
     }

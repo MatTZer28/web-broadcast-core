@@ -145,7 +145,7 @@ export default class Video extends PIXI.Container {
     }
 
     _setGlobalInteraction() {
-        document.body.addEventListener('mouseup', e => {
+        document.addEventListener('mouseup', e => {
             this._dragging = null;
         });
     }

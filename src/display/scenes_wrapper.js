@@ -45,7 +45,7 @@ export default class ScenesWrapper {
     removeSceneByID(id) {
         this._scenes.some((scene) => {
             if (scene.id === id) {
-                this._WBS.removeChild(scene);
+                this._WBS.removeStageChild(scene);
                 this._scenes.splice(this._scenes.indexOf(scene), 1);
                 return true;
             } else return false;

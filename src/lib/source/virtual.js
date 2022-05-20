@@ -158,7 +158,7 @@ export default class Virtual extends PIXI.Container {
     }
 
     _setGlobalInteraction() {
-        document.body.addEventListener('mouseup', e => {
+        document.addEventListener('mouseup', e => {
             this._dragging = null;
         });
     }

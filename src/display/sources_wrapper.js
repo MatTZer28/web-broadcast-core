@@ -59,7 +59,55 @@ export default class SourcesWrapper {
 
     addSource(source) {
         this._sources.push(source);
-        this._parentScene.addChild(source);
+        this._parentScene.addChildAt(source, 0);
+    }
+
+    layerUpFocusedSoucre() {
+        this._sources.some((source) => {
+            if (source.getFocusState() === true) {
+
+                let childIndex = this._parentScene.getChildIndex(source);
+
+                if (childIndex < this._parentScene.children.length - 2) {
+                    this._parentScene.setChildIndex(source, childIndex + 1);
+                }
+
+                return true;
+            } else return false;
+        });
+    }
+
+    layerTopFocusedSoucre() {
+        this._sources.some((source) => {
+            if (source.getFocusState() === true) {
+                this._parentScene.setChildIndex(source, this._parentScene.children.length - 2);
+                return true;
+            } else return false;
+        });
+    }
+
+    layerDownFocusedSoucre() {
+        this._sources.some((source) => {
+            if (source.getFocusState() === true) {
+
+                let childIndex = this._parentScene.getChildIndex(source);
+
+                if (childIndex > 0 && childIndex < this._parentScene.children.length - 1) {
+                    this._parentScene.setChildIndex(source, childIndex - 1);
+                }
+
+                return true;
+            } else return false;
+        });
+    }
+
+    layerBottomFocusedSoucre() {
+        this._sources.some((source) => {
+            if (source.getFocusState() === true) {
+                this._parentScene.setChildIndex(source, 0);
+                return true;
+            } else return false;
+        });
     }
 
     getSourceByID(id) {

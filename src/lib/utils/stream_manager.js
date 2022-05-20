@@ -8,8 +8,10 @@ export default class StreamManager {
 
         this._abps = abps;
 
+        this._mediaStream = this._canvas.captureStream(this._fps);
+
         this._recorder = new MediaRecorder(
-            this._canvas.captureStream(this._fps),
+            this._mediaStream,
             {
                 mimeType: 'video/webm;codecs=h264',
                 videoBitsPerSecond: this._vbps,
@@ -26,7 +28,9 @@ export default class StreamManager {
         this._recorder.stop();
     }
 
-    getRecorder() {
-        return this._recorder;
+    dataAvailable(call) {
+        this._recorder.addEventListener('dataavailable', (event) => {
+            call(event);
+        });
     }
 }

@@ -4,17 +4,38 @@ import StreamManager from './lib/utils/stream_manager';
 import * as PIXI from 'pixi.js'
 
 export class WebBroadcastSystem {
-    constructor(appWidth, appHeight) {
+    constructor(appWidth, appHeight, fps) {
         this.appWidth = appWidth;
 
         this.appHeight = appHeight;
+
+        this.fps = fps;
+
+        this._setrequestAnimationFrame(fps);
         
         this._pixiApp = this._createApplication();
 
         this.background = new PIXI.Sprite(PIXI.Texture.WHITE);
         this._initBackground();
-        
+
         this._scenesWrapper = new ScenesWrapper(this);
+
+        this._streamManager = new StreamManager(this._pixiApp.view, this.fps, 18662000, 384000);
+    }
+
+    _setrequestAnimationFrame(fps) {
+        const worker = new Worker(new URL('./lib/utils/worker.js', import.meta.url));
+
+        worker.postMessage({type: 'start', fps: fps});
+
+        window.requestAnimationFrame = function (callback) {
+            const worker = new Worker(new URL('./lib/utils/worker.js', import.meta.url));
+            worker.postMessage({type: 'start', fps: fps});
+            worker.onmessage = () => {
+                callback();
+                worker.terminate();
+            };
+        }
     }
 
     _createApplication() {
@@ -53,8 +74,8 @@ export class WebBroadcastSystem {
     }
 
     clearStageChild() {
-        if (this._pixiApp.stage.children.length > 0) {
-            this._pixiApp.stage.removeChild(this._pixiApp.stage.children[0]);
+        if (this._pixiApp.stage.children.length > 1) {
+            this._pixiApp.stage.removeChild(this._pixiApp.stage.children[1]);
         }
     }
 

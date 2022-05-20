@@ -612,7 +612,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _setGlobalInteraction() {
-        document.body.addEventListener('mouseup', e => {
+        document.addEventListener('mouseup', e => {
             this._resizeing = null;
         });
     }

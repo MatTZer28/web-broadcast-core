@@ -3,6 +3,8 @@ import StreamManager from './lib/utils/stream_manager';
 
 import * as PIXI from 'pixi.js'
 
+PIXI.utils.skipHello();
+
 export class WebBroadcastSystem {
     constructor(appWidth, appHeight, fps) {
         this.appWidth = appWidth;
@@ -20,7 +22,20 @@ export class WebBroadcastSystem {
 
         this._scenesWrapper = new ScenesWrapper(this);
 
-        this._streamManager = new StreamManager(this._pixiApp.view, this.fps, 18662000, 384000);
+        // this._streamManager = new StreamManager(this._pixiApp.view, this.fps, 18662000, 384000);
+
+        // this._streamManager.startRecording();
+
+        // setTimeout(() => this._streamManager.stopRecording(), 10000);
+
+        // this._streamManager.dataAvailable((event) => {
+        //     const video = document.createElement('video');
+        //     video.src = URL.createObjectURL(event.data);
+        //     video.style.width = '100%';
+        //     video.style.height = '100%';
+        //     video.controls = true;
+        //     document.body.appendChild(video);
+        // });
     }
 
     _setrequestAnimationFrame(fps) {

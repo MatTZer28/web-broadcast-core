@@ -70,12 +70,8 @@ export default class Text extends PIXI.Container {
     }
 
     _showFocusBox() {
-        if (!this._focused) {
-            let width = this._sprite.width;
-            let height = this._sprite.height;
-            let bounds = this._sprite.getBounds();
-            this._sourceWrapper.focusBox.drawFocusBox(bounds.x, bounds.y, width, height);
-        }
+        const bounds = this._sprite.getBounds();
+        this._sourceWrapper.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
     _spriteOnMouseMove(event) {
@@ -161,12 +157,24 @@ export default class Text extends PIXI.Container {
         this._sprite.interactive = state;
     }
 
+    setVisiableState(state) {
+        this._sprite.visible = state;
+    }
+
+    getBounds() {
+        return this._sprite.getBounds();
+    }
+
     getFocusState() {
         return this._focused;
     }
 
     getDraggingState() {
         return this._dragging;
+    }
+
+    getVisibleState() {
+        return this._sprite.visible;
     }
 
     resize(x, y, width, height) {

@@ -85,12 +85,8 @@ export default class Virtual extends PIXI.Container {
     }
 
     _showFocusBox() {
-        if (!this._focused) {
-            let width = this._model.width;
-            let height = this._model.height;
-            let bounds = this._model.getBounds();
-            this._sourceWrapper.focusBox.drawFocusBox(bounds.x, bounds.y, width, height);
-        }
+        const bounds = this._model.getBounds();
+        this._sourceWrapper.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
     }
 
     _modelOnMouseMove(event) {
@@ -289,12 +285,24 @@ export default class Virtual extends PIXI.Container {
         this._model.interactive = state;
     }
 
+    setVisiableState(state) {
+        this._model.visible = state;
+    }
+
+    getBounds() {
+        return this._sprite.getBounds();
+    }
+
     getFocusState() {
         return this._focused;
     }
 
     getDraggingState() {
         return this._dragging;
+    }
+
+    getVisibleState() {
+        return this._sprite.visible;
     }
 
     resize(x, y, width, height) {

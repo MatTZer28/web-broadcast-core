@@ -9,7 +9,7 @@ export default class DisplayMedia {
           };
     }
 
-    async createVideoTexture() { 
+    async createScreenTexture() { 
       const mediaDevices = navigator.mediaDevices;
 
       const videoElement = document.createElement('video');

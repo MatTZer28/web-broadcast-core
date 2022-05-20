@@ -1,7 +1,7 @@
 import FocusBox from '../lib/utils/focus_box';
 import Virtual from '../lib/source/virtual';
 import Image from '../lib/source/image';
-import Video from '../lib/source/video';
+import Screen from '../lib/source/screen';
 import Text from '../lib/source/text';
 import DisplayMedia from '../lib/utils/display_media';
 
@@ -39,12 +39,12 @@ export default class SourcesWrapper {
         return source;
     }
 
-    async createVideoSource(id) {
+    async createScreenSource(id) {
         const displayMedia = new DisplayMedia();
 
-        const sourceTexture = PIXI.Texture.from(await displayMedia.createVideoTexture());
+        const sourceTexture = PIXI.Texture.from(await displayMedia.createScreenTexture());
 
-        const source = new Video(this._WBS, this, id, sourceTexture);
+        const source = new Screen(this._WBS, this, id, sourceTexture);
 
         return source;
     }
@@ -62,7 +62,7 @@ export default class SourcesWrapper {
         this._parentScene.addChildAt(source, 0);
     }
 
-    layerUpFocusedSoucre() {
+    moveUpFocusedSoucre() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
 
@@ -77,7 +77,7 @@ export default class SourcesWrapper {
         });
     }
 
-    layerTopFocusedSoucre() {
+    moveTopFocusedSoucre() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
                 this._parentScene.setChildIndex(source, this._parentScene.children.length - 2);
@@ -86,7 +86,7 @@ export default class SourcesWrapper {
         });
     }
 
-    layerDownFocusedSoucre() {
+    moveDownFocusedSoucre() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
 
@@ -101,13 +101,66 @@ export default class SourcesWrapper {
         });
     }
 
-    layerBottomFocusedSoucre() {
+    moveBottomFocusedSoucre() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
                 this._parentScene.setChildIndex(source, 0);
                 return true;
             } else return false;
         });
+    }
+
+    setFocusedSoucreVisiability(state) {
+        this._sources.some((source) => {
+            if (source.getFocusState() === true) {
+                source.setVisiableState(state);
+                return true;
+            } else return false;
+        });
+    }
+
+    foucusOn(id) {
+        this._sources.some((source) => {
+            if (source.id === id) {
+                this.focusBox.setFocusedTarget(source);
+
+                source.setOnFoucsState(true);
+
+                this.unfocusedWithout(source, false);
+                this.disableInteractiveWithout(source, false);
+                
+                if (source.getVisibleState === true) {
+                    const bounds = source.getBounds();
+                    this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
+                }
+
+                return true;
+            } return false;
+        });
+    }
+
+    getSourceMetaDataByID(id) {
+        const data = {x, y, width, height, visible};
+
+        this._sources.some((source) => {
+            if (source.id === id) {
+                const bounds = source.getBounds();
+
+                data.x = bounds.x;
+
+                data.y = bounds.y;
+
+                data.width = bounds.width;
+
+                data.height = bounds.height;
+
+                data.visible = source.getVisibleState();
+
+                return true;
+            } else return false;
+        });
+
+        return data;
     }
 
     getSourceByID(id) {

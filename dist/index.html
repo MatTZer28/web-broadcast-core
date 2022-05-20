@@ -21,30 +21,20 @@
 
         WBS.getScenesWrapper().createScene('NEW');
         WBS.getScenesWrapper().focusScene('NEW');
+
         let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('1', '1.jpg');
         WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
-        source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('2', '2.jpg');
-        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
-        source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('3', '3.jpg');
-        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().foucusOn('1');
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().setFocusedSoucreVisiability(false);
+        // source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('2', '2.jpg');
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
+        // source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('3', '3.jpg');
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
 
-        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerTopFocusedSoucre();
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerTopFocusedSoucre();
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVideoSource('VIDEO').then((source) => {
         //     WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);   
         // });
-
-        
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.getElementById('top').onclick = () => WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerTopFocusedSoucre();
-            document.getElementById('up').onclick = () => WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerUpFocusedSoucre();
-            document.getElementById('down').onclick = () => WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerDownFocusedSoucre();
-            document.getElementById('bottom').onclick = () => WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerBottomFocusedSoucre();
-        })
     </script>
-    <button id="top">Top</button>
-    <button id="up">Up</button>
-    <button id="down">Down</button>
-    <button id="bottom">Bottom</button>
-    <br>
 </body>
 </html>

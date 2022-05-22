@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "jszip": "^3.10.0",
+    "jszip-utils": "^0.1.0",
     "kalidokit": "^1.1.5",
     "pixi-live2d-display": "^0.3.1",
     "pixi.js": "^5.3.6"

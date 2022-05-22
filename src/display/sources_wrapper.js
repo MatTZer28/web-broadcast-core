@@ -6,6 +6,7 @@ import Screen from '../lib/source/screen';
 import Text from '../lib/source/text';
 import DisplayMedia from '../lib/utils/display_media';
 
+import '../lib/utils/zip'
 import * as PIXI from 'pixi.js'
 
 export default class SourcesWrapper {
@@ -23,8 +24,26 @@ export default class SourcesWrapper {
     }
 
     async createVirtualModel(id, url) {
+        // await new JSZip.external.Promise((resolve, reject) => {
+
+        //     JSZipUtils.getBinaryContent(url, (err, data) => {
+
+        //         if (err) reject(err);
+
+        //         else resolve(data);
+                
+        //     });
+
+        // }).then(async (data) => {
+        //     const zip = await JSZip.loadAsync(data);
+
+        //     const source = new Virtual(this._WBS, this, id);
+
+        //     await source.loadModel(url);
+        // });
+
         const source = new Virtual(this._WBS, this, id);
-        
+
         await source.loadModel(url);
 
         source.zIndex = 2;
@@ -48,7 +67,7 @@ export default class SourcesWrapper {
         const video = document.createElement('video');
 
         video.src = url;
-                
+
         const sourceTexture = PIXI.Texture.from(video);
 
         const source = new Video(this._WBS, this, id, sourceTexture, looping);
@@ -68,7 +87,7 @@ export default class SourcesWrapper {
 
     createTextSource(id, text, style) {
         style = style || {};
-        
+
         const source = new Text(this._WBS, this, id, text, style);
 
         return source;
@@ -132,7 +151,7 @@ export default class SourcesWrapper {
         this._sources.some((source) => {
             if (source.id === id) {
                 if (!source instanceof Video) return false;
-                
+
                 source.setLoopingState(state);
                 return true;
             } else return false;
@@ -164,7 +183,7 @@ export default class SourcesWrapper {
 
                 this.unfocusedWithout(source, false);
                 this.disableInteractiveWithout(source, false);
-                
+
                 const bounds = source.getBounds();
                 this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
 
@@ -174,7 +193,7 @@ export default class SourcesWrapper {
     }
 
     getSourceMetaDataByID(id) {
-        const data = {x: null, y: null, width: null, height: null, visible: null};
+        const data = { x: null, y: null, width: null, height: null, visible: null };
 
         this._sources.some((source) => {
             if (source.id === id) {
@@ -221,7 +240,7 @@ export default class SourcesWrapper {
     }
 
     unfocusedWithout(source, state) {
-        this._sources.forEach(s=> {
+        this._sources.forEach(s => {
             if (s !== source) {
                 s.setOnFoucsState(state);
             }

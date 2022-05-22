@@ -1,6 +1,7 @@
 import FocusBox from '../lib/utils/focus_box';
 import Virtual from '../lib/source/virtual';
 import Image from '../lib/source/image';
+import Video from '../lib/source/video'
 import Screen from '../lib/source/screen';
 import Text from '../lib/source/text';
 import DisplayMedia from '../lib/utils/display_media';
@@ -32,9 +33,25 @@ export default class SourcesWrapper {
     }
 
     createImageSource(id, url) {
-        const sourceTexture = PIXI.Texture.from(url);
+        const image = document.createElement('img');
+
+        image.src = url;
+
+        const sourceTexture = PIXI.Texture.from(image);
 
         const source = new Image(this._WBS, this, id, sourceTexture);
+
+        return source;
+    }
+
+    createVideoSource(id, url, looping) {
+        const video = document.createElement('video');
+
+        video.src = url;
+                
+        const sourceTexture = PIXI.Texture.from(video);
+
+        const source = new Video(this._WBS, this, id, sourceTexture, looping);
 
         return source;
     }
@@ -110,10 +127,29 @@ export default class SourcesWrapper {
         });
     }
 
+
+    setVideoLoopingState(id, state) {
+        this._sources.some((source) => {
+            if (source.id === id) {
+                if (!source instanceof Video) return false;
+                
+                source.setLoopingState(state);
+                return true;
+            } else return false;
+        });
+    }
+
     setFocusedSoucreVisiability(state) {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
+
                 source.setVisiableState(state);
+
+                if (state = true) {
+                    const bounds = source.getBounds();
+                    this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
+                } else this.focusBox.clearFocusBox();
+
                 return true;
             } else return false;
         });

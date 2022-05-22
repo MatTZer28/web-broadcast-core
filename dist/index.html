@@ -13,7 +13,18 @@
 </head>
 <body>
     <script defer>
-        const WBS = new webBroadcastCore.WebBroadcastSystem(1920, 1080, 60);
+        const settings = {
+            width: 1920,
+            height: 1080,
+            platform: 'Youtube',
+            stream_key: 'sxz2-hwfy-67b5-sydy-4q20',
+            fps: 60,
+            vbps: 18662000,
+            abps: 712000,
+        }
+
+        const WBS = new webBroadcastCore.WebBroadcastSystem(setting);
+
         const canvas = WBS.getApplicationView();
         canvas.style.width = '100%';
         canvas.style.height = '100%';
@@ -22,19 +33,25 @@
         WBS.getScenesWrapper().createScene('NEW');
         WBS.getScenesWrapper().focusScene('NEW');
 
-        let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('1', '1.jpg');
-        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
+        // let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('1', '1.jpg');
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
+
+        // let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVideoSource('1', '1.mkv', true);
+        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
+
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().foucusOn('1');
+
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().setFocusedSoucreVisiability(false);
+
         // source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('2', '2.jpg');
+
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
         // source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('3', '3.jpg');
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
 
-        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().layerTopFocusedSoucre();
-        // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVideoSource('VIDEO').then((source) => {
-        //     WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);   
-        // });
+        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createScreenSource('SCREEN').then((source) => {
+            WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
+        });
     </script>
 </body>
 </html>

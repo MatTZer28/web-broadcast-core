@@ -651,8 +651,8 @@ export default class FocusBox extends PIXI.Container {
         this._focusBox.border.lineStyle(4, 0xEB4034);
         this._focusBox.border.drawRect(x, y, width, height);
 
-        const dotWidth = 15;
-        const dotHeight = 15;
+        const dotWidth = 10;
+        const dotHeight = 10;
 
         const first = ["top", "middle", "bottom"];
         const last = ["Left", "Middle", "Right"];

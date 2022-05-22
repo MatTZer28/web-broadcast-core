@@ -6,7 +6,7 @@ export default class DisplayMedia {
               frameRate: { ideal: 60, max: 60 }
             },
             audio: true
-          };
+        };
     }
 
     async createScreenTexture() { 

@@ -6,14 +6,12 @@ import * as PIXI from 'pixi.js'
 PIXI.utils.skipHello();
 
 export class WebBroadcastSystem {
-    constructor(appWidth, appHeight, fps) {
-        this.appWidth = appWidth;
+    constructor(settings) {
+        this.appWidth = settings.width;
 
-        this.appHeight = appHeight;
+        this.appHeight = settings.height;
 
-        this.fps = fps;
-
-        this._setrequestAnimationFrame(fps);
+        this._setrequestAnimationFrame();
         
         this._pixiApp = this._createApplication();
 
@@ -22,30 +20,21 @@ export class WebBroadcastSystem {
 
         this._scenesWrapper = new ScenesWrapper(this);
 
-        // this._streamManager = new StreamManager(this._pixiApp.view, this.fps, 18662000, 384000);
+        const stream_settings = {
+            platform: settings.platform,
+            stream_key: settings.stream_key,
+            fps: settings.fps,
+            vbps: settings.vbps,
+            abps: settings.abps
+        }
 
-        // this._streamManager.startRecording();
-
-        // setTimeout(() => this._streamManager.stopRecording(), 10000);
-
-        // this._streamManager.dataAvailable((event) => {
-        //     const video = document.createElement('video');
-        //     video.src = URL.createObjectURL(event.data);
-        //     video.style.width = '100%';
-        //     video.style.height = '100%';
-        //     video.controls = true;
-        //     document.body.appendChild(video);
-        // });
+        this._streamManager = new StreamManager(this._pixiApp.view, stream_settings);
     }
 
-    _setrequestAnimationFrame(fps) {
-        const worker = new Worker(new URL('./lib/utils/worker.js', import.meta.url));
-
-        worker.postMessage({type: 'start', fps: fps});
-
-        window.requestAnimationFrame = function (callback) {
+    _setrequestAnimationFrame() {
+        window.requestAnimationFrame = (callback) => {
             const worker = new Worker(new URL('./lib/utils/worker.js', import.meta.url));
-            worker.postMessage({type: 'start', fps: fps});
+            worker.postMessage('start');
             worker.onmessage = () => {
                 callback();
                 worker.terminate();

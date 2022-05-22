@@ -145,10 +145,10 @@ export default class SourcesWrapper {
 
                 source.setVisiableState(state);
 
-                if (state = true) {
+                if (state === true) {
                     const bounds = source.getBounds();
                     this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
-                } else this.focusBox.clearFocusBox();
+                } else this.focusBox.resetFocusBox();
 
                 return true;
             } else return false;
@@ -165,10 +165,8 @@ export default class SourcesWrapper {
                 this.unfocusedWithout(source, false);
                 this.disableInteractiveWithout(source, false);
                 
-                if (source.getVisibleState === true) {
-                    const bounds = source.getBounds();
-                    this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
-                }
+                const bounds = source.getBounds();
+                this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
 
                 return true;
             } return false;
@@ -176,7 +174,7 @@ export default class SourcesWrapper {
     }
 
     getSourceMetaDataByID(id) {
-        const data = {x, y, width, height, visible};
+        const data = {x: null, y: null, width: null, height: null, visible: null};
 
         this._sources.some((source) => {
             if (source.id === id) {

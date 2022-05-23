@@ -226,6 +226,7 @@ export default class SourcesWrapper {
             if (source.id === id) {
                 this._parentScene.removeChild(source);
                 this._sources.splice(this._sources.indexOf(source), 1);
+                this.focusBox.resetFocusBox();
                 return true;
             } else return false;
         });

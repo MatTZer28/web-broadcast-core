@@ -6,7 +6,7 @@ window.PIXI = PIXI;
 const { Live2DModel } = require('pixi-live2d-display');
 
 export default class Virtual extends PIXI.Container {
-    constructor(WBS, sourceWrapper, id) {
+    constructor(WBS, sourceWrapper, id, metadata) {
         super();
 
         this._dragging = false;
@@ -18,6 +18,8 @@ export default class Virtual extends PIXI.Container {
         this._sourceWrapper = sourceWrapper;
 
         this.id = id;
+
+        this._metadata = metadata;
 
         this._blueBox = new PIXI.Graphics();
     }
@@ -49,9 +51,18 @@ export default class Virtual extends PIXI.Container {
     _initModel() {
         this._model.scale.set(0.2);
         this._model.anchor.set(0.5);
-        this._model.x = this._WBS.appWidth / 2;
-        this._model.y = this._WBS.appHeight / 2;
         this._focused = false;
+
+        if (this._metadata) {
+            this._model.x = this._metadata.x;
+            this._model.y = this._metadata.y;
+            this._model.width = this._metadata.width;
+            this._model.height = this._metadata.height;
+            this._model.visible = this._metadata.visible;
+        } else {
+            this._model.x = this._WBS.appWidth / 2;
+            this._model.y = this._WBS.appHeight / 2;
+        }
     }
 
     _setModelInteraction() {

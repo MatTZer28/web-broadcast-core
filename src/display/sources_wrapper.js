@@ -23,26 +23,8 @@ export default class SourcesWrapper {
         this._parentScene.addChild(this.focusBox);
     }
 
-    async createVirtualModel(id, url) {
-        // await new JSZip.external.Promise((resolve, reject) => {
-
-        //     JSZipUtils.getBinaryContent(url, (err, data) => {
-
-        //         if (err) reject(err);
-
-        //         else resolve(data);
-                
-        //     });
-
-        // }).then(async (data) => {
-        //     const zip = await JSZip.loadAsync(data);
-
-        //     const source = new Virtual(this._WBS, this, id);
-
-        //     await source.loadModel(url);
-        // });
-
-        const source = new Virtual(this._WBS, this, id);
+    async createVirtualModel(id, url, metadata) {
+        const source = new Virtual(this._WBS, this, id, metadata);
 
         await source.loadModel(url);
 
@@ -51,26 +33,28 @@ export default class SourcesWrapper {
         return source;
     }
 
-    createImageSource(id, url) {
+    createImageSource(id, url, metadata) {
+        metadata = metadata || null;
+
         const image = document.createElement('img');
 
         image.src = url;
 
         const sourceTexture = PIXI.Texture.from(image);
 
-        const source = new Image(this._WBS, this, id, sourceTexture);
+        const source = new Image(this._WBS, this, id, sourceTexture, metadata);
 
         return source;
     }
 
-    createVideoSource(id, url, looping) {
+    createVideoSource(id, url, looping, metadata) {
         const video = document.createElement('video');
 
         video.src = url;
 
         const sourceTexture = PIXI.Texture.from(video);
 
-        const source = new Video(this._WBS, this, id, sourceTexture, looping);
+        const source = new Video(this._WBS, this, id, sourceTexture, looping, metadata);
 
         return source;
     }
@@ -85,10 +69,10 @@ export default class SourcesWrapper {
         return source;
     }
 
-    createTextSource(id, text, style) {
+    createTextSource(id, text, style, metadata) {
         style = style || {};
 
-        const source = new Text(this._WBS, this, id, text, style);
+        const source = new Text(this._WBS, this, id, text, style, metadata);
 
         return source;
     }

@@ -33,7 +33,15 @@
         WBS.getScenesWrapper().createScene('NEW');
         WBS.getScenesWrapper().focusScene('NEW');
 
-        // let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('1', '1.jpg');
+        const metadata = {
+            x: 50,
+            y: 50,
+            width: 100,
+            height: 100,
+            visible: true,
+        }
+
+        // let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('1', '1.jpg', metadata);
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
 
         // let source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVideoSource('1', '1.mkv', true);
@@ -45,7 +53,7 @@
         // source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('3', '3.jpg');
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
 
-        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVirtualModel('VIRTUAL', './preview_1.zip').then((source) => {
+        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVirtualModel('VIRTUAL', './preview_1.zip', metadata).then((source) => {
             WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
         });
 

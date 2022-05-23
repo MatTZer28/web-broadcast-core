@@ -21,12 +21,6 @@ export default class Video extends PIXI.Container {
         this._sprite = PIXI.Sprite.from(this._texture);
         this._sprite.name = 'sprite';
 
-        this._sprite.x = this._metadata.x || this._sprite.x;
-        this._sprite.y = this._metadata.y || this._sprite.y;
-        this._sprite.width = this._metadata.width || this._sprite.width;
-        this._sprite.height = this._metadata.height || this._sprite.height;
-        this._sprite.visible = this._metadata.visible || this._sprite.visible;
-
         this._sprite.texture.baseTexture.resource.source.loop = looping;
 
         this._blueBox = new PIXI.Graphics();
@@ -46,16 +40,17 @@ export default class Video extends PIXI.Container {
         this._sprite.anchor.set(0.5);
         this._focused = false;
 
-        if (this._metadata) {
-            this._sprite.x = this._metadata.x;
-            this._sprite.y = this._metadata.y;
-            this._sprite.width = this._metadata.width;
-            this._sprite.height = this._metadata.height;
-            this._sprite.visible = this._metadata.visible;
-        } else {
-            this._sprite.x = this._WBS.appWidth / 2;
-            this._sprite.y = this._WBS.appHeight / 2;
-        }
+        if (this._metadata.x) this._sprite.x = this._metadata.x;
+        else this._sprite.x = this._WBS.appWidth / 2;
+
+        if (this._metadata.y) this._sprite.y = this._metadata.y;
+        else this._sprite.y = this._WBS.appHeight / 2;
+
+        if (this._metadata.width) this._sprite.width = this._metadata.width;
+
+        if (this._metadata.height) this._sprite.height = this._metadata.height;
+
+        if (this._metadata.visible) this._sprite.visible = this._metadata.visible;
     }
 
     _setSpriteInteraction() {

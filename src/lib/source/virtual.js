@@ -53,16 +53,17 @@ export default class Virtual extends PIXI.Container {
         this._model.anchor.set(0.5);
         this._focused = false;
 
-        if (this._metadata) {
-            this._model.x = this._metadata.x;
-            this._model.y = this._metadata.y;
-            this._model.width = this._metadata.width;
-            this._model.height = this._metadata.height;
-            this._model.visible = this._metadata.visible;
-        } else {
-            this._model.x = this._WBS.appWidth / 2;
-            this._model.y = this._WBS.appHeight / 2;
-        }
+        if (this._metadata.x) this._model.x = this._metadata.x;
+        else this._model.x = this._WBS.appWidth / 2;
+
+        if (this._metadata.y) this._model.y = this._metadata.y;
+        else this._model.y = this._WBS.appHeight / 2;
+
+        if (this._metadata.width) this._model.width = this._metadata.width;
+
+        if (this._metadata.height) this._model.height = this._metadata.height;
+
+        if (this._metadata.visible) this._model.visible = this._metadata.visible;
     }
 
     _setModelInteraction() {

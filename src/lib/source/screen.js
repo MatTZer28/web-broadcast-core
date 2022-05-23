@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 
 export default class Screen extends PIXI.Container {
-    constructor(WBS, sourceWrapper, id, texture) {
+    constructor(WBS, sourceWrapper, id, texture, metadata) {
         super();
 
         this._dragging = false;
@@ -15,6 +15,8 @@ export default class Screen extends PIXI.Container {
         this.id = id;
 
         this._texture = texture;
+
+        this._metadata = metadata;
 
         this._sprite = PIXI.Sprite.from(this._texture);
         this._sprite.name = 'sprite';
@@ -36,9 +38,19 @@ export default class Screen extends PIXI.Container {
 
     _initSprite() {
         this._sprite.anchor.set(0.5);
-        this._sprite.x = this._WBS.appWidth / 2;
-        this._sprite.y = this._WBS.appHeight / 2;
         this._focused = false;
+
+        if (this._metadata.x) this._sprite.x = this._metadata.x;
+        else this._sprite.x = this._WBS.appWidth / 2;
+
+        if (this._metadata.y) this._sprite.y = this._metadata.y;
+        else this._sprite.y = this._WBS.appHeight / 2;
+
+        if (this._metadata.width) this._sprite.width = this._metadata.width;
+
+        if (this._metadata.height) this._sprite.height = this._metadata.height;
+
+        if (this._metadata.visible) this._sprite.visible = this._metadata.visible;
     }
 
     _setSpriteInteraction() {

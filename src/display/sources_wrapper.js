@@ -24,6 +24,8 @@ export default class SourcesWrapper {
     }
 
     async createVirtualModel(id, url, metadata) {
+        metadata = metadata || null;
+        
         const source = new Virtual(this._WBS, this, id, metadata);
 
         await source.loadModel(url);
@@ -48,6 +50,8 @@ export default class SourcesWrapper {
     }
 
     createVideoSource(id, url, looping, metadata) {
+        metadata = metadata || null;
+        
         const video = document.createElement('video');
 
         video.src = url;
@@ -59,17 +63,21 @@ export default class SourcesWrapper {
         return source;
     }
 
-    async createScreenSource(id) {
+    async createScreenSource(id, metadata) {
+        metadata = metadata || null;
+        
         const displayMedia = new DisplayMedia();
 
         const sourceTexture = PIXI.Texture.from(await displayMedia.createScreenTexture());
 
-        const source = new Screen(this._WBS, this, id, sourceTexture);
+        const source = new Screen(this._WBS, this, id, sourceTexture, metadata);
 
         return source;
     }
 
     createTextSource(id, text, style, metadata) {
+        metadata = metadata || null;
+
         style = style || {};
 
         const source = new Text(this._WBS, this, id, text, style, metadata);

@@ -40,10 +40,10 @@ export default class Video extends PIXI.Container {
         this._sprite.anchor.set(0.5);
         this._focused = false;
 
-        if (this._metadata.x) this._sprite.x = this._metadata.x;
+        if (this._metadata.x && this._metadata.width) this._sprite.x = this._metadata.x + this._metadata.width / 2;
         else this._sprite.x = this._WBS.appWidth / 2;
 
-        if (this._metadata.y) this._sprite.y = this._metadata.y;
+        if (this._metadata.y && this._metadata.height) this._sprite.y = this._metadata.y + this._metadata.height / 2;
         else this._sprite.y = this._WBS.appHeight / 2;
 
         if (this._metadata.width) this._sprite.width = this._metadata.width;
@@ -72,8 +72,8 @@ export default class Video extends PIXI.Container {
         this._focused = true;
         this._dragging = true;
 
-        this._sourceWrapper.unfocusedWithout(this, false);
-        this._sourceWrapper.disableInteractiveWithout(this, false);
+        this._sourceWrapper.setFocusedStateWithout(this.id, false);
+        this._sourceWrapper.setInteractiveStateWithout(this.id, false);
 
         this._sprite.prevInteractX = event.data.global.x;
         this._sprite.prevInteractY = event.data.global.y;
@@ -109,9 +109,9 @@ export default class Video extends PIXI.Container {
     _spriteOnMouseUp(event) {
         this._dragging = false;
 
-        this._sourceWrapper.disableInteractiveWithout(this, true);
+        this._sourceWrapper.setInteractiveStateWithout(this.id, true);
 
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _spriteOnMouseOver(event) {

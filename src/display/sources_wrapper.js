@@ -7,6 +7,7 @@ import Text from '../lib/source/text';
 import DisplayMedia from '../lib/utils/display_media';
 
 import '../lib/utils/zip'
+
 import * as PIXI from 'pixi.js'
 
 export default class SourcesWrapper {
@@ -23,12 +24,14 @@ export default class SourcesWrapper {
         this._parentScene.addChild(this.focusBox);
     }
 
-    async createVirtualModel(id, url, metadata) {
-        metadata = metadata || null;
-        
+    async createVirtualModel(id, data, metadata) {
+        metadata = metadata || { x: null, y: null, width: null, height: null, visible: null };
+
         const source = new Virtual(this._WBS, this, id, metadata);
 
-        await source.loadModel(url);
+        const data_url = URL.createObjectURL(await (await fetch(data)).blob());
+
+        await source.loadModel('zip://' + data_url);
 
         source.zIndex = 2;
 
@@ -36,7 +39,7 @@ export default class SourcesWrapper {
     }
 
     createImageSource(id, url, metadata) {
-        metadata = metadata || null;
+        metadata = metadata || { x: null, y: null, width: null, height: null, visible: null };
 
         const image = document.createElement('img');
 
@@ -50,11 +53,13 @@ export default class SourcesWrapper {
     }
 
     createVideoSource(id, url, looping, metadata) {
-        metadata = metadata || null;
-        
+        metadata = metadata || { x: null, y: null, width: null, height: null, visible: null };
+
         const video = document.createElement('video');
 
         video.src = url;
+
+        video.muted = true;
 
         const sourceTexture = PIXI.Texture.from(video);
 
@@ -64,8 +69,8 @@ export default class SourcesWrapper {
     }
 
     async createScreenSource(id, metadata) {
-        metadata = metadata || null;
-        
+        metadata = metadata || { x: null, y: null, width: null, height: null, visible: null };
+
         const displayMedia = new DisplayMedia();
 
         const sourceTexture = PIXI.Texture.from(await displayMedia.createScreenTexture());
@@ -76,7 +81,7 @@ export default class SourcesWrapper {
     }
 
     createTextSource(id, text, style, metadata) {
-        metadata = metadata || null;
+        metadata = metadata || { x: null, y: null, width: null, height: null, visible: null };
 
         style = style || {};
 
@@ -166,19 +171,33 @@ export default class SourcesWrapper {
         });
     }
 
+    setSoucreVisiabilityByID(id, state) {
+        this._sources.some((source) => {
+            if (source.id === id) {
+
+                source.setVisiableState(state);
+
+                if (state === true) {
+                    const bounds = source.getBounds();
+                    this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
+                } else this.focusBox.resetFocusBox();
+
+                return true;
+            } else return false;
+        });
+    }
+
     foucusOn(id) {
         this._sources.some((source) => {
             if (source.id === id) {
                 this.focusBox.setFocusedTarget(source);
 
-                source.setOnFoucsState(true);
-
-                this.unfocusedWithout(source, false);
-                this.disableInteractiveWithout(source, false);
-
                 const bounds = source.getBounds();
                 this.focusBox.drawFocusBox(bounds.x, bounds.y, bounds.width, bounds.height);
 
+                this.setFocusedStateWithout(source.id, false);
+
+                source.setOnFoucsState(true);
                 return true;
             } return false;
         });
@@ -232,17 +251,17 @@ export default class SourcesWrapper {
         });
     }
 
-    unfocusedWithout(source, state) {
+    setFocusedStateWithout(id, state) {
         this._sources.forEach(s => {
-            if (s !== source) {
+            if (s.id !== id) {
                 s.setOnFoucsState(state);
             }
         });
     }
 
-    disableInteractiveWithout(source, state) {
+    setInteractiveStateWithout(id, state) {
         this._sources.forEach(s => {
-            if (s !== source) {
+            if (s.id !== id) {
                 s.setInteractiveState(state);
             }
         });

@@ -118,7 +118,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _topLeftOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setTopMiddleScaleInteraction() {
@@ -179,7 +179,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _topMiddleOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setTopRightScaleInteraction() {
@@ -261,7 +261,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _topRightOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setMiddleLeftScaleInteraction() {
@@ -322,7 +322,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _middleLeftOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setMiddleRightScaleInteraction() {
@@ -384,7 +384,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _middleRightOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setBottomLeftScaleInteraction() {
@@ -465,7 +465,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _bottomLeftOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setBottomMiddleScaleInteraction() {
@@ -526,7 +526,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _bottomMiddleOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setBottomRightScaleInteraction() {
@@ -608,7 +608,7 @@ export default class FocusBox extends PIXI.Container {
     }
 
     _bottomRightOnMouseOut(event) {
-        this._WBS.setCursor("auto");
+        this._WBS.setCursor("inherit");
     }
 
     _setGlobalInteraction() {

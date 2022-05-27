@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/dylanNew/live2d/webgl/Live2D/lib/live2d.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="./face-api.min.js""></script>
     <script type="text/javascript" src="./web-boardcast-core.bundle.js"></script>
-    <script type="text/javascript" src="./15ddd8722d71ec21.js"></script>
     <title>Document</title>
 </head>
 <body>
@@ -43,7 +43,7 @@
         // source = WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createImageSource('3', '3.jpg');
         // WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
 
-        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVirtualModel('VIRTUAL', '').then((source) => {
+        WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().createVirtualModel('VIRTUAL', './preview_2.zip').then((source) => {
             WBS.getScenesWrapper().getSceneByID('NEW').getSourcesWrapper().addSource(source);
         });
 

@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 
 export default class Image extends PIXI.Container {
     constructor(WBS, sourceWrapper, id, texture, metadata) {

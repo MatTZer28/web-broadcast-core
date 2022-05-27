@@ -1,6 +1,6 @@
 import Screen from '../source/screen';
 
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 
 export default class FocusBox extends PIXI.Container {
     constructor(WBS) {

@@ -6,9 +6,9 @@ import Screen from '../lib/source/screen';
 import Text from '../lib/source/text';
 import DisplayMedia from '../lib/utils/display_media';
 
-import '../lib/utils/zip'
+import '../lib/utils/zip';
 
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 
 export default class SourcesWrapper {
     constructor(WBS, parentScene) {
@@ -24,10 +24,12 @@ export default class SourcesWrapper {
         this._parentScene.addChild(this.focusBox);
     }
 
-    async createVirtualModel(id, data, metadata) {
+    async createVirtualModel(id, data, metadata, expressions_map) {
         metadata = metadata || { x: null, y: null, width: null, height: null, visible: null };
 
-        const source = new Virtual(this._WBS, this, id, metadata);
+        expressions_map = expressions_map || { angry: null, disgusted: null, fearful: null, happy: null, neutral: null, sad: null, surprised: null };
+
+        const source = new Virtual(this._WBS, this, id, metadata, expressions_map);
 
         const data_url = URL.createObjectURL(await (await fetch(data)).blob());
 

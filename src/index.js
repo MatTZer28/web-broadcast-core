@@ -1,7 +1,7 @@
 import ScenesWrapper from './display/scenes_wrapper';
 import StreamManager from './lib/utils/stream_manager';
 
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 
 PIXI.utils.skipHello();
 
@@ -45,7 +45,8 @@ export class WebBroadcastSystem {
     _createApplication() {
         return new PIXI.Application({
             width: this.appWidth,
-            height: this.appHeight
+            height: this.appHeight,
+            antialias: true,
         });
     }
 

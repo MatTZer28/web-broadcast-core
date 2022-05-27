@@ -1,6 +1,6 @@
 import SourcesWrapper from "../display/sources_wrapper";
 
-import * as PIXI from 'pixi.js'
+import * as PIXI from 'pixi.js';
 
 export default class Scene extends PIXI.Container {
     constructor(WBS, id) {

@@ -6,7 +6,7 @@ window.PIXI = PIXI;
 const { Live2DModel } = require('pixi-live2d-display');
 
 export default class Virtual extends PIXI.Container {
-    constructor(WBS, sourceWrapper, id, metadata) {
+    constructor(WBS, sourceWrapper, id, metadata, expressions_map) {
         super();
 
         this._dragging = false;
@@ -21,6 +21,8 @@ export default class Virtual extends PIXI.Container {
 
         this._metadata = metadata;
 
+        this._expressions_map = expressions_map;
+
         this._blueBox = new PIXI.Graphics();
     }
 
@@ -34,6 +36,12 @@ export default class Virtual extends PIXI.Container {
         this._facemesh = new FaceMesh({locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
         }});
+
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('/models');
+
+        await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+
+        await faceapi.nets.faceExpressionNet.loadFromUri('/models');
 
         this._initModel();
 
@@ -211,58 +219,57 @@ export default class Virtual extends PIXI.Container {
 
         const coreModel = this._model.internalModel.coreModel;
 
-        this._model.internalModel.motionManager.update = (...args) => {
-            this._model.internalModel.eyeBlink = undefined;
+        this._model.internalModel.eyeBlink = undefined;
 
-            const EyeBallX = Kalidokit.Vector.lerp(result.pupil.x, coreModel.getParameterValueById("ParamEyeBallX"), lerpAmount);
+        const EyeBallX = Kalidokit.Vector.lerp(result.pupil.x, coreModel.getParameterValueById("ParamEyeBallX"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamEyeBallX", EyeBallX);
-            coreModel.setParameterValueById("PARAM_EYE_BALL_X", EyeBallX);
+        coreModel.setParameterValueById("ParamEyeBallX", EyeBallX);
+        coreModel.setParameterValueById("PARAM_EYE_BALL_X", EyeBallX);
 
-            const EyeBallY = Kalidokit.Vector.lerp(result.pupil.y, coreModel.getParameterValueById("ParamEyeBallY"), lerpAmount);
+        const EyeBallY = Kalidokit.Vector.lerp(result.pupil.y, coreModel.getParameterValueById("ParamEyeBallY"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamEyeBallY", EyeBallY);
-            coreModel.setParameterValueById("PARAM_EYE_BALL_y", EyeBallY);
+        coreModel.setParameterValueById("ParamEyeBallY", EyeBallY);
+        coreModel.setParameterValueById("PARAM_EYE_BALL_y", EyeBallY);
 
-            const angleX = Kalidokit.Vector.lerp(result.head.degrees.y, coreModel.getParameterValueById("ParamAngleX"), lerpAmount);
+        const angleX = Kalidokit.Vector.lerp(result.head.degrees.y, coreModel.getParameterValueById("ParamAngleX"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamAngleX", angleX);
-            coreModel.setParameterValueById("PARAM_ANGLE_X", angleX);
+        coreModel.setParameterValueById("ParamAngleX", angleX);
+        coreModel.setParameterValueById("PARAM_ANGLE_X", angleX);
 
-            const angleY = Kalidokit.Vector.lerp(result.head.degrees.x, coreModel.getParameterValueById("ParamAngleY"), lerpAmount);
+        const angleY = Kalidokit.Vector.lerp(result.head.degrees.x, coreModel.getParameterValueById("ParamAngleY"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamAngleY", angleY);
-            coreModel.setParameterValueById("PARAM_ANGLE_Y", angleY);
+        coreModel.setParameterValueById("ParamAngleY", angleY);
+        coreModel.setParameterValueById("PARAM_ANGLE_Y", angleY);
 
-            const angleZ = Kalidokit.Vector.lerp(result.head.degrees.z, coreModel.getParameterValueById("ParamAngleZ"), lerpAmount);
+        const angleZ = Kalidokit.Vector.lerp(result.head.degrees.z, coreModel.getParameterValueById("ParamAngleZ"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamAngleZ", angleZ);
-            coreModel.setParameterValueById("PARAM_ANGLE_Z", angleZ);
+        coreModel.setParameterValueById("ParamAngleZ", angleZ);
+        coreModel.setParameterValueById("PARAM_ANGLE_Z", angleZ);
 
-            const dampener = 0.3;
-            const bodyAngleX = Kalidokit.Vector.lerp(result.head.degrees.y * dampener, coreModel.getParameterValueById("ParamBodyAngleX"), lerpAmount);
+        const dampener = 0.3;
+        const bodyAngleX = Kalidokit.Vector.lerp(result.head.degrees.y * dampener, coreModel.getParameterValueById("ParamBodyAngleX"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamBodyAngleX", bodyAngleX);
-            coreModel.setParameterValueById("PARAM_BODY_ANGLE_X", bodyAngleX);
+        coreModel.setParameterValueById("ParamBodyAngleX", bodyAngleX);
+        coreModel.setParameterValueById("PARAM_BODY_ANGLE_X", bodyAngleX);
 
-            const bodyAngleY = Kalidokit.Vector.lerp(result.head.degrees.x * dampener, coreModel.getParameterValueById("ParamBodyAngleY"), lerpAmount);
+        const bodyAngleY = Kalidokit.Vector.lerp(result.head.degrees.x * dampener, coreModel.getParameterValueById("ParamBodyAngleY"), lerpAmount);
 
 
-            coreModel.setParameterValueById("ParamBodyAngleY", bodyAngleY);
-            coreModel.setParameterValueById("PARAM_BODY_ANGLE_Y", bodyAngleY);
+        coreModel.setParameterValueById("ParamBodyAngleY", bodyAngleY);
+        coreModel.setParameterValueById("PARAM_BODY_ANGLE_Y", bodyAngleY);
 
-            const bodyAngleZ = Kalidokit.Vector.lerp(result.head.degrees.z * dampener, coreModel.getParameterValueById("ParamBodyAngleZ"), lerpAmount);
+        const bodyAngleZ = Kalidokit.Vector.lerp(result.head.degrees.z * dampener, coreModel.getParameterValueById("ParamBodyAngleZ"), lerpAmount);
 
-            coreModel.setParameterValueById("ParamBodyAngleZ", bodyAngleZ);
-            coreModel.setParameterValueById("PARAM_BODY_ANGLE_Z", bodyAngleZ);
+        coreModel.setParameterValueById("ParamBodyAngleZ", bodyAngleZ);
+        coreModel.setParameterValueById("PARAM_BODY_ANGLE_Z", bodyAngleZ);
 
+        if (this._model.internalModel.motionManager.expressionManager.isFinished()) {
             const eyeLOpen = Kalidokit.Vector.lerp(result.eye.l, coreModel.getParameterValueById("ParamEyeLOpen"), 0.5);
 
             coreModel.setParameterValueById("ParamEyeLOpen", eyeLOpen);
             coreModel.setParameterValueById("PARAM_EYE_L_OPEN", eyeLOpen);
 
             const eyeROpen = Kalidokit.Vector.lerp(result.eye.r, coreModel.getParameterValueById("ParamEyeROpen"), 0.5);
-
 
             coreModel.setParameterValueById("ParamEyeROpen", eyeROpen);
             coreModel.setParameterValueById("PARAM_EYE_R_OPEN", eyeROpen);
@@ -276,17 +283,57 @@ export default class Virtual extends PIXI.Container {
 
             coreModel.setParameterValueById("ParamMouthForm", mouthForm);
             coreModel.setParameterValueById("PARAM_MOUTH_FORM", mouthForm);
-        };
+        }
     }
 
     _startCamera() {
+        const intervalMS = 2000;
+
+        let lastTime = Date.now();
+
         const camera = new Camera(this._videoElement, {
             onFrame: async () => {
                 await this._facemesh.send({ image: this._videoElement });
+
+                if (Date.now() - lastTime > intervalMS) {
+                    this._faceExpressionDetection();
+                    lastTime = Date.now();
+                }
             }
         });
 
         camera.start();
+    }
+
+    _faceExpressionDetection() {
+        faceapi.detectSingleFace(this._videoElement).withFaceLandmarks().withFaceExpressions().then(async (result) => {
+            const expression = this._calculateFaceExpression(result);
+
+            if (expression !== 'neutral') {
+                if (this._expressions_map[expression] !== null) {
+                    await this._model.internalModel.motionManager.expressionManager.setExpression(this._expressions_map[expression]);
+                }
+            } else {
+                this._model.internalModel.motionManager.expressionManager.stopAllExpressions();
+            }
+        })
+    }
+
+    _calculateFaceExpression(result) {
+        if (result) {
+            const expressions = result.expressions;
+            let key = 'angry';
+            let max = expressions[key];
+            for (const expression in expressions) {
+                if (expressions[expression] > max) {
+                    max = expressions[expression];
+                    key = expression;
+                }
+            }
+
+            return key;
+        }
+        else return 'neutral';
     }
 
     setOnFoucsState(state) {

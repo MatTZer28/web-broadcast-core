@@ -345,11 +345,11 @@ export default class Virtual extends PIXI.Container {
     }
 
     setVisiableState(state) {
-        this._model.visible = state;
+        this.visible = state;
     }
 
     getBounds() {
-        return this._sprite.getBounds();
+        return this._model.getBounds();
     }
 
     getFocusState() {
@@ -361,7 +361,7 @@ export default class Virtual extends PIXI.Container {
     }
 
     getVisibleState() {
-        return this._sprite.visible;
+        return this.visible;
     }
 
     resize(x, y, width, height) {

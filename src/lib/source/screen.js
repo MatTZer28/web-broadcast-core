@@ -219,7 +219,7 @@ export default class Screen extends PIXI.Container {
     }
 
     getVisibleState() {
-        return this._sprite.visible;
+        return this.visible;
     }
 
     resize(x, y, width, height) {

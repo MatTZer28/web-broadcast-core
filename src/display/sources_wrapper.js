@@ -97,7 +97,7 @@ export default class SourcesWrapper {
         this._parentScene.addChildAt(source, 0);
     }
 
-    moveUpFocusedSoucre() {
+    moveUpFocusedSource() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
 
@@ -112,7 +112,7 @@ export default class SourcesWrapper {
         });
     }
 
-    moveTopFocusedSoucre() {
+    moveTopFocusedSource() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
                 this._parentScene.setChildIndex(source, this._parentScene.children.length - 2);
@@ -121,7 +121,7 @@ export default class SourcesWrapper {
         });
     }
 
-    moveDownFocusedSoucre() {
+    moveDownFocusedSource() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
 
@@ -136,7 +136,7 @@ export default class SourcesWrapper {
         });
     }
 
-    moveBottomFocusedSoucre() {
+    moveBottomFocusedSource() {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
                 this._parentScene.setChildIndex(source, 0);
@@ -157,7 +157,7 @@ export default class SourcesWrapper {
         });
     }
 
-    setFocusedSoucreVisiability(state) {
+    setFocusedSourceVisiability(state) {
         this._sources.some((source) => {
             if (source.getFocusState() === true) {
 
@@ -173,7 +173,7 @@ export default class SourcesWrapper {
         });
     }
 
-    setSoucreVisiabilityByID(id, state) {
+    setSourceVisiabilityByID(id, state) {
         this._sources.some((source) => {
             if (source.id === id) {
 

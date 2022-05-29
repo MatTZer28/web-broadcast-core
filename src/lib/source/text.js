@@ -173,7 +173,7 @@ export default class Text extends PIXI.Container {
     }
 
     setVisiableState(state) {
-        this._sprite.visible = state;
+        this.visible = state;
     }
 
     getBounds() {
@@ -189,7 +189,7 @@ export default class Text extends PIXI.Container {
     }
 
     getVisibleState() {
-        return this._sprite.visible;
+        return this.visible;
     }
 
     resize(x, y, width, height) {
